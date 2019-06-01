@@ -17,16 +17,21 @@ steps:
     - npm i --silent
     - npm run lint
     when:
-      event: [ pull_request ]
+      event: [ pull_request, push ]
       branch: master
 
   - name: npm
     image: plugins/npm
     settings:
+      email:
+        from_secret: npm_email
       username:
         from_secret: npm_username
       password:
         from_secret: npm_password
+    when:
+      event: push
+      branch: master
 
   - name: slack-build-finished
     image: plugins/slack
