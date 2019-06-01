@@ -29,6 +29,3 @@ export {
   Request,
   Postgres,
 };
-
-const service = new ServiceBase();
-service.init().then(() => service.logger.log('Initialized...'));
