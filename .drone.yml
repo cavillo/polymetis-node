@@ -19,7 +19,7 @@ steps:
     - npm run lint
     when:
       event: [ pull_request ]
-      branch: master
+      branch: [ master, dev ]
 
   - name: slack-build-finished
     image: plugins/slack
