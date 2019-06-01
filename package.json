@@ -2,7 +2,7 @@
   "name": "polymetis-node",
   "version": "1.0.2",
   "description": "Wrapper for building micro-services. Polymetis provides a connection to a rabbit message broker for handling events & task, redis, mongodb and postgres connections.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "start-ts": "ts-node --fast --transpileOnly src/index.ts",
