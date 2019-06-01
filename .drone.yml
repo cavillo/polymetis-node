@@ -25,7 +25,7 @@ steps:
     image: node:latest
     commands:
     - npm i --silent
-    - npm run bild
+    - npm run build
     when:
       event: push
       branch: master
