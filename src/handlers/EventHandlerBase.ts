@@ -5,7 +5,7 @@ import { ServiceResources } from '../ServiceBase';
 export default abstract class EvenHandlerBase extends HandlerBase{
   public abstract topic: string;
 
-  constructor(resources: ServiceResources){
+  constructor(resources: ServiceResources) {
     super(resources);
   }
 

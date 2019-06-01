@@ -26,7 +26,7 @@ export default class RedisClientBase extends events.EventEmitter {
     // extend the redisOptions with our own retry strategy
     const redisConf = conf.redis;
     _.extend(redisConf, {
-      retryStrategy: this.onRedisRetry.bind(this)
+      retryStrategy: this.onRedisRetry.bind(this),
     });
 
     // setup our new redis client
@@ -52,9 +52,9 @@ export default class RedisClientBase extends events.EventEmitter {
         }
 
         try {
-          reply = JSON.parse(reply);
+          const retval = JSON.parse(reply);
 
-          resolve(reply);
+          resolve(retval);
         } catch (error) {
           resolve();
         }
@@ -211,12 +211,13 @@ export default class RedisClientBase extends events.EventEmitter {
   }
 
   protected log(data: any): void {
+    let retval = data;
     if (!_.isObject(data)) {
-      data = {
-        message: data
+      retval = {
+        message: data,
       };
     }
 
-    this.logger.log(JSON.stringify(data));
+    this.logger.log(JSON.stringify(retval));
   }
 }

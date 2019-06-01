@@ -9,7 +9,7 @@ export {
   Configuration,
   Response,
   Request,
-}
+};
 
 import {
   serviceConf,
