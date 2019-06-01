@@ -14,12 +14,19 @@ steps:
     group: lint
     image: node:latest
     commands:
-    - cd api
     - npm i --silent
     - npm run lint
     when:
       event: [ pull_request ]
       branch: master
+
+  - name: npm
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: npm_username
+      password:
+        from_secret: npm_password
 
   - name: slack-build-finished
     image: plugins/slack
