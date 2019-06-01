@@ -20,7 +20,7 @@ steps:
       event: [ pull_request ]
       branch: master
 
-  - name: lint
+  - name: build
     group: lint
     image: node:latest
     commands:
