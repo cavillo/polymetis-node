@@ -1,0 +1,34 @@
+import ServiceBase, {
+  Configuration,
+  ServiceResources,
+  Response,
+  Request,
+} from './ServiceBase';
+
+import {
+  HandlerBase,
+  EventHandlerBase,
+  TaskHandlerBase,
+} from './handlers';
+
+import {
+  ApiRoute,
+} from './api';
+
+import Postgres from './postgres';
+
+export {
+  Configuration,
+  ServiceResources,
+  ServiceBase,
+  HandlerBase,
+  EventHandlerBase,
+  TaskHandlerBase,
+  ApiRoute,
+  Response,
+  Request,
+  Postgres,
+};
+
+const service = new ServiceBase();
+service.init().then(() => service.logger.log('Initialized...'));

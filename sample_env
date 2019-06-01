@@ -1,0 +1,25 @@
+# service
+ENVIRONMENT='test'
+SERVICE='service'
+PORT='8901'
+
+# RabbitMQ
+RABBITMQ_USERNAME='guest'
+RABBITMQ_PASSWORD='guest'
+RABBITMQ_HOST='localhost'
+RABBITMQ_PORT='5672'
+
+MONGO_URL='mongodb://localhost'
+MONGO_USERNAME='service'
+MONGO_PASSWORD='service'
+MONGO_PORT='27001'
+
+POSTGRES_HOST='localhost'
+POSTGRES_PORT='5432'
+POSTGRES_USERNAME='service'
+POSTGRES_PASSWORD='service'
+POSTGRES_DATABASE='service'
+POSTGRES_SSL='true'
+
+REDIS_HOST='localhost'
+REDIS_PORT='6379'

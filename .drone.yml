@@ -1,0 +1,49 @@
+kind: pipeline
+name: polymetis-node-ci
+
+steps:
+  - name: slack-build-start
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: polymetis-node
+      template: >
+          {{build.event}} to `{{ lowercase build.branch }}` by *{{ build.author }}* -> {{ build.link }}
+
+  - name: lint
+    group: lint
+    image: node:latest
+    commands:
+    - npm i --silent
+    - npm run lint
+    when:
+      event: [ pull_request, push ]
+      branch: master
+
+  - name: npm
+    image: plugins/npm
+    settings:
+      email:
+        from_secret: npm_email
+      username:
+        from_secret: npm_username
+      password:
+        from_secret: npm_password
+    when:
+      event: push
+      branch: master
+
+  - name: slack-build-finished
+    image: plugins/slack
+    settings:
+      webhook: https://hooks.slack.com/services/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
+      channel: dployer
+      template: >
+        {{#success build.status}}
+          {{build.event}} to `{{ lowercase build.branch }}` succeeded. Good job *{{ build.author }}*.
+        {{else}}
+          {{build.event}} to `{{ lowercase build.branch }}` failed. Please by *{{ build.author }}* fix me -> {{ build.link }}
+        {{/success}}
+    when:
+      event: [ push, pull_request ]
+      branch: master

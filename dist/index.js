@@ -1,0 +1,18 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const ServiceBase_1 = __importDefault(require("./ServiceBase"));
+exports.ServiceBase = ServiceBase_1.default;
+const handlers_1 = require("./handlers");
+exports.HandlerBase = handlers_1.HandlerBase;
+exports.EventHandlerBase = handlers_1.EventHandlerBase;
+exports.TaskHandlerBase = handlers_1.TaskHandlerBase;
+const api_1 = require("./api");
+exports.ApiRoute = api_1.ApiRoute;
+const postgres_1 = __importDefault(require("./postgres"));
+exports.Postgres = postgres_1.default;
+const service = new ServiceBase_1.default();
+service.init().then(() => service.logger.log('Initialized...'));
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7QUFBQSxnRUFLdUI7QUFpQnJCLHNCQXRCSyxxQkFBVyxDQXNCTDtBQWZiLHlDQUlvQjtBQVlsQixzQkFmQSxzQkFBVyxDQWVBO0FBQ1gsMkJBZkEsMkJBQWdCLENBZUE7QUFDaEIsMEJBZkEsMEJBQWUsQ0FlQTtBQVpqQiwrQkFFZTtBQVdiLG1CQVpBLGNBQVEsQ0FZQTtBQVRWLDBEQUFrQztBQVloQyxtQkFaSyxrQkFBUSxDQVlMO0FBR1YsTUFBTSxPQUFPLEdBQUcsSUFBSSxxQkFBVyxFQUFFLENBQUM7QUFDbEMsT0FBTyxDQUFDLElBQUksRUFBRSxDQUFDLElBQUksQ0FBQyxHQUFHLEVBQUUsQ0FBQyxPQUFPLENBQUMsTUFBTSxDQUFDLEdBQUcsQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgU2VydmljZUJhc2UsIHtcbiAgQ29uZmlndXJhdGlvbixcbiAgU2VydmljZVJlc291cmNlcyxcbiAgUmVzcG9uc2UsXG4gIFJlcXVlc3QsXG59IGZyb20gJy4vU2VydmljZUJhc2UnO1xuXG5pbXBvcnQge1xuICBIYW5kbGVyQmFzZSxcbiAgRXZlbnRIYW5kbGVyQmFzZSxcbiAgVGFza0hhbmRsZXJCYXNlLFxufSBmcm9tICcuL2hhbmRsZXJzJztcblxuaW1wb3J0IHtcbiAgQXBpUm91dGUsXG59IGZyb20gJy4vYXBpJztcblxuaW1wb3J0IFBvc3RncmVzIGZyb20gJy4vcG9zdGdyZXMnO1xuXG5leHBvcnQge1xuICBDb25maWd1cmF0aW9uLFxuICBTZXJ2aWNlUmVzb3VyY2VzLFxuICBTZXJ2aWNlQmFzZSxcbiAgSGFuZGxlckJhc2UsXG4gIEV2ZW50SGFuZGxlckJhc2UsXG4gIFRhc2tIYW5kbGVyQmFzZSxcbiAgQXBpUm91dGUsXG4gIFJlc3BvbnNlLFxuICBSZXF1ZXN0LFxuICBQb3N0Z3Jlcyxcbn07XG5cbmNvbnN0IHNlcnZpY2UgPSBuZXcgU2VydmljZUJhc2UoKTtcbnNlcnZpY2UuaW5pdCgpLnRoZW4oKCkgPT4gc2VydmljZS5sb2dnZXIubG9nKCdJbml0aWFsaXplZC4uLicpKTsiXX0=
