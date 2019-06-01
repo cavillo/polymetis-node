@@ -17,7 +17,17 @@ steps:
     - npm i --silent
     - npm run lint
     when:
-      event: [ pull_request, push ]
+      event: [ pull_request ]
+      branch: master
+
+  - name: build
+    group: lint
+    image: node:latest
+    commands:
+    - npm i --silent
+    - npm run bild
+    when:
+      event: push
       branch: master
 
   - name: npm
