@@ -1,0 +1,31 @@
+{
+  "name": "polymetis-node",
+  "version": "1.0.0",
+  "description": "Wrapper for building micro-services. Polymetis provides a connection to a rabbit message broker for handling events & task, redis, mongodb and postgres connections.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cavillo/polymetis-node.git"
+  },
+  "keywords": [
+    "microservice",
+    "rabbitmq",
+    "amqp",
+    "redis",
+    "mongo",
+    "mongodb",
+    "postgres",
+    "typescript",
+    "api",
+    "express"
+  ],
+  "author": "cavillo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cavillo/polymetis-node/issues"
+  },
+  "homepage": "https://github.com/cavillo/polymetis-node#readme"
+}
