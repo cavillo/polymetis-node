@@ -22,9 +22,21 @@ export default class RedisClientBase extends events.EventEmitter {
 
     // get rid of the max listeners limit
     this.setMaxListeners(0);
+  }
+
+  public async init() {
+    if (
+      !this.conf
+      || !this.conf.redis
+      || !this.conf.redis.host
+      || !this.conf.redis.port
+    ) {
+      this.logger.warn('Redis: No parameters for initialization. Skiping...');
+      return;
+    }
 
     // extend the redisOptions with our own retry strategy
-    const redisConf = conf.redis;
+    const redisConf = this.conf.redis;
     _.extend(redisConf, {
       retryStrategy: this.onRedisRetry.bind(this),
     });
@@ -41,6 +53,7 @@ export default class RedisClientBase extends events.EventEmitter {
     this.redisClient.addListener('warning', this.onWarning.bind(this));
 
     this.logger.ok('Redis Initialized...');
+
   }
 
   public async get(key: string): Promise<any> {
