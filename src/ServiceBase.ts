@@ -59,7 +59,7 @@ export default class ServiceBase {
     if (conf) {
       configuration = _.merge(
         configuration,
-        _.pick(conf, _.keys(configuration))
+        _.pick(conf, _.keys(configuration)),
       );
     }
     this.logger = new Logger(configuration.service);
