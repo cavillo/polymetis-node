@@ -77,7 +77,7 @@ export const mongoConf: MongoConfiguration = {
   },
   url: _.get(process.env, 'MONGO_URL', 'localhost'),
   port: _.toNumber(_.get(process.env, 'MONGO_PORT', 5432)),
-  dbName: `${serviceConf.environment}_${serviceConf.service}`,
+  dbName: _.get(process.env, 'MONGO_DATABASE', `${serviceConf.environment}_${serviceConf.service}`),
 };
 export const postgresConf: PostgresConfiguration = {
   host: _.get(process.env, 'POSTGRES_HOST', 'service'),
