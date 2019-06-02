@@ -8,9 +8,21 @@ import Logger from '../utils/Logger';
 let db: DatabaseInstance;
 
 export default class Postgres {
-  constructor(protected configuration: PostgresConfiguration, protected logger: Logger) { }
+  constructor(protected conf: PostgresConfiguration, protected logger: Logger) { }
 
   public async init() {
+    if (
+         !this.conf
+      || !this.conf.host
+      || !this.conf.port
+      || !this.conf.user
+      || !this.conf.password
+      || !this.conf.database
+    ) {
+      this.logger.warn('Postgres: No parameters for initialization. Skiping...');
+      return;
+    }
+
     await this.dbInstance();
     this.logger.ok('Postgres Initialized...');
   }
@@ -24,7 +36,7 @@ export default class Postgres {
       enhancedFunctions: true,
     };
 
-    db = await massive(this.configuration, connectionOptions);
+    db = await massive(this.conf, connectionOptions);
 
     return db;
   }

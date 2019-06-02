@@ -9,6 +9,7 @@ export default class RedisClientBase extends events.EventEmitter {
     protected logger: Logger;
     protected redisClient: redis.RedisClient;
     constructor(conf: Configuration, logger: Logger);
+    init(): Promise<void>;
     get(key: string): Promise<any>;
     keys(pattern: string): Promise<any>;
     mget(keys: string[]): Promise<any>;

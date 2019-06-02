@@ -4,21 +4,20 @@ import { RabbitConfiguration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
 
 export default class RabbitService {
-  private logger: Logger;
   private connection?: amqplib.Connection;
   private channel?: amqplib.Channel;
   private url: string;
   private queueName: string;
   private exchangeName: string;
 
-  constructor(conf: RabbitConfiguration, logger: Logger) {
+  constructor(protected conf: RabbitConfiguration, protected logger: Logger) {
     const username = conf.username;
     const password = conf.password;
     const host = conf.host;
     const port = conf.port;
 
-    this.logger = logger;
-    this.exchangeName = conf.exchange || 'local';
+    this.queueName = conf.exchange;
+    this.exchangeName = conf.exchange;
     this.queueName = conf.queue || '';
     this.url = `amqp://${username}:${password}@${host}:${port}`;
   }
@@ -35,6 +34,18 @@ export default class RabbitService {
   }
 
   public async init() {
+    if (
+         !this.conf
+      || !this.conf.host
+      || !this.conf.port
+      || !this.conf.username
+      || !this.conf.password
+      || !this.conf.exchange
+      || !this.conf.queue
+    ) {
+      this.logger.warn('RabbitMQ: No parameters for initialization. Skiping...');
+      return;
+    }
     const channel = await this.connect();
     if (!channel) throw new Error('Rabbit failed');
 

@@ -1,48 +1,48 @@
 export interface ServiceConfiguration {
-    environment: string;
-    service: string;
-    port: number;
+    environment?: string;
+    service?: string;
+    port?: number;
 }
 export interface ApiConfiguration {
-    port: number;
+    port?: number;
 }
 export interface RedisConfiguration {
-    host: string;
-    port: number;
+    host?: string;
+    port?: number;
 }
 export interface RabbitConfiguration {
-    host: string;
-    port: number;
-    username: string;
-    password: string;
-    exchange: string;
-    queue: string;
+    host?: string;
+    port?: number;
+    username?: string;
+    password?: string;
+    exchange?: string;
+    queue?: string;
 }
 export interface MongoConfiguration {
-    auth: {
-        user: string;
-        password: string;
+    auth?: {
+        user?: string;
+        password?: string;
     };
-    url: string;
-    port: number;
-    dbName: string;
+    url?: string;
+    port?: number;
+    dbName?: string;
 }
 export interface PostgresConfiguration {
-    host: string;
-    port: number;
-    user: string;
-    password: string;
-    database: string;
-    ssl: boolean;
+    host?: string;
+    port?: number;
+    user?: string;
+    password?: string;
+    database?: string;
+    ssl?: boolean;
 }
 export interface Configuration {
-    baseDir: string;
-    service: ServiceConfiguration;
-    rabbit: RabbitConfiguration;
-    mongo: MongoConfiguration;
-    api: ApiConfiguration;
-    redis: RedisConfiguration;
-    postgres: PostgresConfiguration;
+    baseDir?: string;
+    service?: ServiceConfiguration;
+    rabbit?: RabbitConfiguration;
+    mongo?: MongoConfiguration;
+    api?: ApiConfiguration;
+    redis?: RedisConfiguration;
+    postgres?: PostgresConfiguration;
 }
 export declare const serviceConf: ServiceConfiguration;
 export declare const apiConf: ApiConfiguration;

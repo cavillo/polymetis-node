@@ -1,6 +1,6 @@
 import { ServiceBase, Configuration } from '../dist';
 
-const conf = {
+const conf: Configuration = {
   mongo: {
     port: 27017,
   },

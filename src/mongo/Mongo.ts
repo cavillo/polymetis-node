@@ -21,8 +21,20 @@ export default class MongoDB {
 
   public async init() {
     try {
+      if (
+           !this.conf
+        || !this.conf.url
+        || !this.conf.auth
+        || !this.conf.auth.user
+        || !this.conf.auth.password
+        || !this.conf.dbName
+        || !this.conf.port
+      ) {
+        this.logger.warn('MongoDB: No parameters for initialization. Skiping...');
+        return;
+      }
       const mongoOpts: mongodb.MongoClientOptions = {
-        auth: this.conf.auth,
+        auth: _.get(this.conf, 'auth', null),
         authSource: this.conf.dbName,
         keepAlive: true,
         useNewUrlParser: true,
@@ -34,8 +46,7 @@ export default class MongoDB {
 
       this.logger.ok('MongoDB initialized...');
     } catch (error) {
-      this.logger.error('MongoDB failed: ', error.message);
-      throw error;
+      this.logger.error('MongoDB initialization failed: ', error.message);
     }
   }
 

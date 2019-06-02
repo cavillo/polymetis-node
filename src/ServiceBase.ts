@@ -87,6 +87,7 @@ export default class ServiceBase {
     // Initialize infrastructure services
     await this.resources.rabbit.init();
     await this.resources.mongo.init();
+    await this.resources.redis.init();
     await this.resources.pg.init();
 
     // Events & Tasks

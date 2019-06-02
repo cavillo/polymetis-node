@@ -2,7 +2,8 @@ import amqplib from 'amqplib';
 import { RabbitConfiguration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
 export default class RabbitService {
-    private logger;
+    protected conf: RabbitConfiguration;
+    protected logger: Logger;
     private connection?;
     private channel?;
     private url;
