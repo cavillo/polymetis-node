@@ -56,7 +56,7 @@ export const serviceConf: ServiceConfiguration = {
   port: _.toNumber(_.get(process.env, 'PORT', 8000)),
 };
 export const apiConf: ApiConfiguration = {
-  port: _.toNumber(_.get(process.env, 'PORT', 8000)),
+  port: serviceConf.port,
 };
 export const redisConf: RedisConfiguration = {
   host: _.get(process.env, 'REDIS_HOST', 'localhost'),
@@ -76,12 +76,12 @@ export const mongoConf: MongoConfiguration = {
     password: _.get(process.env, 'MONGO_PASSWORD', 'service'),
   },
   url: _.get(process.env, 'MONGO_URL', 'localhost'),
-  port: _.toNumber(_.get(process.env, 'MONGO_PORT', 5432)),
+  port: _.toNumber(_.get(process.env, 'MONGO_PORT', 27017)),
   dbName: _.get(process.env, 'MONGO_DATABASE', `${serviceConf.environment}_${serviceConf.service}`),
 };
 export const postgresConf: PostgresConfiguration = {
   host: _.get(process.env, 'POSTGRES_HOST', 'service'),
-  port: _.toNumber(_.get(process.env, 'POSTGRES_PORT', '5432')),
+  port: _.toNumber(_.get(process.env, 'POSTGRES_PORT', 5432)),
   user: _.get(process.env, 'POSTGRES_USERNAME', 'service'),
   password: _.get(process.env, 'POSTGRES_PASSWORD', 'service'),
   database: _.get(process.env, 'POSTGRES_DATABASE', 'service'),
