@@ -6,7 +6,6 @@ configureEnvironmentVariables();
 export interface ServiceConfiguration {
   environment?: string;
   service?: string;
-  port?: number;
 }
 export interface ApiConfiguration {
   port?: number;
@@ -53,10 +52,9 @@ export interface Configuration {
 export const serviceConf: ServiceConfiguration = {
   environment: _.get(process.env, 'ENVIRONMENT'),
   service: _.get(process.env, 'SERVICE'),
-  port: _.toNumber(_.get(process.env, 'PORT')),
 };
 export const apiConf: ApiConfiguration = {
-  port: serviceConf.port,
+  port: _.toNumber(_.get(process.env, 'API_PORT')),
 };
 export const redisConf: RedisConfiguration = {
   host: _.get(process.env, 'REDIS_HOST'),
