@@ -57,10 +57,10 @@ export default class ServiceBase {
       postgres: postgresConf,
     };
     if (conf) {
-      configuration = {
-        ...configuration,
-        ..._.pick(conf, _.keys(configuration)),
-      };
+      configuration = _.merge(
+        configuration,
+        _.pick(conf, _.keys(configuration)),
+      );
     }
     this.logger = new Logger(configuration.service);
     const rabbit = new Rabbit(configuration.rabbit, this.logger);
