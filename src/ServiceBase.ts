@@ -5,12 +5,6 @@ import * as fs from 'fs';
 import * as bodyParser from 'body-parser';
 import cors from 'cors';
 
-export {
-  Configuration,
-  Response,
-  Request,
-};
-
 import {
   serviceConf,
   rabbitConf,
@@ -288,3 +282,10 @@ export default class ServiceBase {
     next();
   }
 }
+
+export {
+  Configuration,
+  Response,
+  Request,
+  Logger,
+};
