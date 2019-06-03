@@ -4,6 +4,12 @@ import ServiceBase, {
   Response,
   Request,
   Logger,
+  ServiceConfiguration,
+  MongoConfiguration,
+  PostgresConfiguration,
+  RabbitConfiguration,
+  ApiConfiguration,
+  RedisConfiguration,
 } from './ServiceBase';
 
 import {
@@ -30,4 +36,10 @@ export {
   Request,
   Postgres,
   Logger,
+  ServiceConfiguration,
+  MongoConfiguration,
+  PostgresConfiguration,
+  RabbitConfiguration,
+  ApiConfiguration,
+  RedisConfiguration,
 };
