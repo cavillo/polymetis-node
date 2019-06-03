@@ -13,6 +13,12 @@ import {
   redisConf,
   postgresConf,
   Configuration,
+  ServiceConfiguration,
+  MongoConfiguration,
+  PostgresConfiguration,
+  RabbitConfiguration,
+  ApiConfiguration,
+  RedisConfiguration,
 } from './utils/ServiceConf';
 import HandlerBase from './handlers/HandlerBase';
 import Rabbit from './rabbit/Rabbit';
@@ -32,6 +38,7 @@ export interface ServiceResources {
 }
 
 export default class ServiceBase {
+  public configuration: Configuration;
   public logger: Logger;
   protected resources: ServiceResources;
   protected app: Express;
@@ -40,7 +47,7 @@ export default class ServiceBase {
   protected tasks: any;
   protected routes: any;
 
-  constructor(conf?: Configuration | any) {
+  constructor(conf?: Configuration) {
     let configuration: Configuration = {
       baseDir: __dirname,
       service: serviceConf,
@@ -56,6 +63,7 @@ export default class ServiceBase {
         _.pick(conf, _.keys(configuration)),
       );
     }
+    this.configuration = configuration;
     this.logger = new Logger(configuration.service);
     const rabbit = new Rabbit(configuration.rabbit, this.logger);
     const mongo = new Mongo(configuration.mongo, this.logger);
@@ -288,4 +296,10 @@ export {
   Response,
   Request,
   Logger,
+  ServiceConfiguration,
+  MongoConfiguration,
+  PostgresConfiguration,
+  RabbitConfiguration,
+  ApiConfiguration,
+  RedisConfiguration,
 };
