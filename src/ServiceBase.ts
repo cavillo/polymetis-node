@@ -40,9 +40,9 @@ export interface ServiceResources {
 export default class ServiceBase {
   public configuration: Configuration;
   public logger: Logger;
-  protected resources: ServiceResources;
-  protected app: Express;
+  public app: Express;
 
+  protected resources: ServiceResources;
   protected events: any;
   protected tasks: any;
   protected routes: any;
