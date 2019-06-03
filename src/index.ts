@@ -3,6 +3,7 @@ import ServiceBase, {
   ServiceResources,
   Response,
   Request,
+  Logger,
 } from './ServiceBase';
 
 import {
@@ -28,4 +29,5 @@ export {
   Response,
   Request,
   Postgres,
+  Logger,
 };

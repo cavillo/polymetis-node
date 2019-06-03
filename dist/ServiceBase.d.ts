@@ -1,5 +1,4 @@
 import { Express, Request, Response } from 'express';
-export { Configuration, Response, Request, };
 import { Configuration } from './utils/ServiceConf';
 import Rabbit from './rabbit/Rabbit';
 import Mongo from './mongo/Mongo';
@@ -28,3 +27,4 @@ export default class ServiceBase {
     private loadRoutes;
     private logApiRoute;
 }
+export { Configuration, Response, Request, Logger, };
