@@ -8,6 +8,7 @@ import Logger from '../utils/Logger';
 let db: DatabaseInstance;
 
 export default class Postgres {
+  protected instance: DatabaseInstance;
   constructor(protected conf: PostgresConfiguration, protected logger: Logger) { }
 
   public async init() {
@@ -23,7 +24,7 @@ export default class Postgres {
       return;
     }
 
-    await this.dbInstance();
+    this.instance = await this.dbInstance();
     this.logger.ok('Postgres Initialized...');
   }
 
