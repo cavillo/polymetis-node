@@ -293,6 +293,7 @@ export default class ServiceBase {
 
 export {
   Configuration,
+  Express,
   Response,
   Request,
   Logger,

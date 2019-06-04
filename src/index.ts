@@ -1,6 +1,7 @@
 import ServiceBase, {
   Configuration,
   ServiceResources,
+  Express,
   Response,
   Request,
   Logger,
@@ -22,7 +23,7 @@ import {
   ApiRoute,
 } from './api';
 
-import Postgres from './postgres';
+import Postgres, { DatabaseInstance } from './postgres';
 
 export {
   Configuration,
@@ -32,6 +33,7 @@ export {
   EventHandlerBase,
   TaskHandlerBase,
   ApiRoute,
+  Express,
   Response,
   Request,
   Postgres,
@@ -42,4 +44,5 @@ export {
   RabbitConfiguration,
   ApiConfiguration,
   RedisConfiguration,
+  DatabaseInstance,
 };
