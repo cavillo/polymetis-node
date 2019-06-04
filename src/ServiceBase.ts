@@ -41,8 +41,8 @@ export default class ServiceBase {
   public configuration: Configuration;
   public logger: Logger;
   public app: Express;
+  public resources: ServiceResources;
 
-  protected resources: ServiceResources;
   protected events: any;
   protected tasks: any;
   protected routes: any;
