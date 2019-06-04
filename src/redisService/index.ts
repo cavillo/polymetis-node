@@ -14,14 +14,11 @@ export type redisExpireCallback = (pattern: string) => void;
 
 // class
 export default class RedisClientBase extends events.EventEmitter {
-  protected redisClient: redis.RedisClient;
+  public client: redis.RedisClient;
 
   constructor(protected conf: Configuration, protected logger: Logger) {
     // call the super first
     super();
-
-    // get rid of the max listeners limit
-    this.setMaxListeners(0);
   }
 
   public async init() {
@@ -42,151 +39,18 @@ export default class RedisClientBase extends events.EventEmitter {
     });
 
     // setup our new redis client
-    this.redisClient = redis.createClient(redisConf);
+    this.client = redis.createClient(redisConf);
 
     // bind a ton of events to the redis client to listen in on everything happening
-    this.redisClient.addListener('error', this.onError.bind(this));
-    this.redisClient.addListener('connect', this.onConnect.bind(this));
-    this.redisClient.addListener('reconnecting', this.onReconnecting.bind(this));
-    this.redisClient.addListener('ready', this.onReady.bind(this));
-    this.redisClient.addListener('end', this.onEnd.bind(this));
-    this.redisClient.addListener('warning', this.onWarning.bind(this));
+    this.client.addListener('error', this.onError.bind(this));
+    this.client.addListener('connect', this.onConnect.bind(this));
+    this.client.addListener('reconnecting', this.onReconnecting.bind(this));
+    this.client.addListener('ready', this.onReady.bind(this));
+    this.client.addListener('end', this.onEnd.bind(this));
+    this.client.addListener('warning', this.onWarning.bind(this));
 
     this.logger.ok('Redis Initialized...');
 
-  }
-
-  public async get(key: string): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      this.redisClient.get(key, (error: Error, reply: any) => {
-        if (Boolean(error)) {
-          reject(error);
-          return;
-        }
-
-        try {
-          const retval = JSON.parse(reply);
-
-          resolve(retval);
-        } catch (error) {
-          resolve();
-        }
-      });
-    });
-  }
-
-  public async keys(pattern: string): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      this.redisClient.keys(pattern, (error, reply) => {
-        if (Boolean(error)) {
-          reject(error);
-          return;
-        }
-
-        resolve(reply);
-      });
-    });
-  }
-
-  public async mget(keys: string[]): Promise<any> {
-    if (!Boolean(keys.length)) {
-      return Promise.resolve({});
-    }
-
-    return new Promise<any>((resolve, reject) => {
-      this.redisClient.mget(keys, (error, reply) => {
-        const result = {};
-
-        if (Boolean(error)) {
-          reject(error);
-          return;
-        }
-
-        _.each(reply, (value, index) => {
-          try {
-            result[keys[index]] = JSON.parse(value);
-          } catch (error) {
-            result[keys[index]] = value;
-          }
-        });
-
-        resolve(result);
-      });
-    });
-  }
-
-  public async del(key: string): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      this.redisClient.del(key, (error) => {
-        if (Boolean(error)) {
-          reject(error);
-          return;
-        }
-
-        resolve();
-      });
-    });
-  }
-
-  public async set(key: string, value: any): Promise<any> {
-
-    return new Promise<any>((resolve, reject) => {
-      this.redisClient.set(key, JSON.stringify(value), (error: Error) => {
-        if (Boolean(error)) {
-          reject(error);
-          return;
-        }
-
-        resolve();
-      });
-    });
-  }
-
-  public async scan(...args: any[]): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      args.push((error, reply) => {
-        if (Boolean(error)) {
-          reject(error);
-          return;
-        }
-
-        resolve(reply);
-      });
-
-      this.redisClient.scan.apply(this.redisClient, args);
-    });
-  }
-
-  public async scanAll(pattern: string): Promise<string[]> {
-    let foundKeys = [];
-    let matches = await this.scan('0', 'match', pattern);
-
-    while (_.get<string>(matches, '[0]', '') !== '0') {
-      foundKeys = foundKeys.concat(_.get(matches, '[1]', []));
-      matches = await this.scan(_.get(matches, '[0]', '0'), 'match', pattern);
-    }
-
-    return foundKeys.concat(_.get(matches, '[1]', []));
-  }
-
-  public async getByPattern(pattern: string): Promise<any> {
-    const keys = await this.scanAll(pattern);
-
-    return await this.mget(keys);
-  }
-
-  public quit(): any {
-    return this.redisClient.quit();
-  }
-
-  public expire(pattern: string, seconds: number, cb: redisExpireCallback): any {
-    return this.redisClient.expire(pattern, seconds, (num) => {
-      cb(pattern);
-    });
-  }
-
-  public getStorageKey(key: string): string {
-    return `${this.conf.service.environment}.${this.conf.service.service}.${key}`;
   }
 
   protected onRedisRetry(options: Object): number {
