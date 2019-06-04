@@ -1,6 +1,9 @@
 import * as _ from 'lodash';
-import massive from 'massive';
-export type DatabaseInstance = massive.Database;
+import massive, { Database as DatabaseInstance } from 'massive';
+
+export {
+  DatabaseInstance,
+};
 
 import { PostgresConfiguration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
@@ -8,7 +11,7 @@ import Logger from '../utils/Logger';
 let db: DatabaseInstance;
 
 export default class Postgres {
-  protected instance: DatabaseInstance;
+  public instance: DatabaseInstance;
   constructor(protected conf: PostgresConfiguration, protected logger: Logger) { }
 
   public async init() {
