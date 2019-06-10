@@ -36,7 +36,7 @@ export default abstract class RouteBase {
   */
   protected abstract async callback(req: Request, res: Response): Promise<any>;
 
-  protected async requireAuthentication(req: Request) {
+  protected async requireAuthentication(req: Request): Promise<any> {
     // Requiring token in Authorization header in the format
     // Authorization: Bearer #accessToken#
     const authHeader = req.headers.authorization;
@@ -54,7 +54,7 @@ export default abstract class RouteBase {
 
     const accessToken = authSplit[1];
     try {
-      this.resources.logger.warn('TODO', 'validating token...');
+      this.resources.logger.warn('TODO', 'validating token...', accessToken);
     } catch (error) {
       throw Error('Invalid token');
     }

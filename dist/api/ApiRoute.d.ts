@@ -6,6 +6,6 @@ export default abstract class RouteBase {
     constructor(resources: ServiceResources);
     routeCallback(req: Request, res: Response): Promise<any>;
     protected abstract callback(req: Request, res: Response): Promise<any>;
-    protected requireAuthentication(req: Request): Promise<void>;
+    protected requireAuthentication(req: Request): Promise<any>;
     protected detectKnownErrors(thrownError: Error, httpResponse: Response): Promise<import("express-serve-static-core").Response>;
 }
