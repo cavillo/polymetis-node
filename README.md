@@ -2,10 +2,10 @@
 
 [![Build Status](http://cloud.drone.io/api/badges/cavillo/polymetis-node/status.svg)](http://cloud.drone.io/cavillo/polymetis-node)
 
-Wrapper for building micro-services ecosystems. Polymetis provides a connection to a rabbit message broker for handling events & task, redis, mongodb and postgres connections.
+Wrapper for building micro-services ecosystems. Polymetis creates microservices with a connection to a rabbit message broker for handling events, task and RPC; and a connection to data storages such as redis, mongodb and postgres.
 
   - REST API for external or internal http consumption
-  - RabbitMQ for event-task mesaging
+  - RabbitMQ for event-task mesaging and Remote Procedure Calls
   - Redis connection provided for pub-sub or fast storage (cache maybe)
   - MongoDB specific collections usage per service for isolated data storage
   - Postgres connection for persistance storage shared between services
@@ -182,7 +182,7 @@ base_dir
 
 ### API
 Polymetis creates an **ExpressJS REST API** for the service on the port specified in the configuration. The endpoints should be implemented as follow:
-All endpoints name should follow the following ruules
+All endpoints name should follow the following rules
 - endpoints are defined in the ```baseDir/api``` directory specified un the service configuration
 - endpoints **must start with** the method to implement ```get.``` | ```post.``` | ```put.``` | ```delete.```
 - endpoints **must end with** ```.route.ts```
@@ -266,4 +266,42 @@ export default class Handler extends TaskHandlerBase {
 ```
 
 > **Note:** polymetis prefixs task topic's automaticaly with the service name specified in the configuration **configuration.service.service**. In the example (asumming the service name is `email`), the real topic to listen is check.healthz, but polymetis abstract this so every event emits and listens only for its own tasks.
+
+### RPC
+Polymetis allows to call remote procedures defined and published by the microservices in the ecosystem. Remote procedures are called using RabbitMQ.
+All defined RCP in a service:
+- are defined in the ```baseDir/rpc``` directory specified un the service configuration
+- **must end with** ```.rpc.ts```
+- **must define**  ```this.topic``` wich represents the name of the procedure
+- **must implement**  ```this.handleCallback(data: any): Promise<any>``` wich will be the function that implements the logic of the procedure
+All files that follow this rules will be loaded as rpc when the service starts following the format ```environment.service.rpc.PROC_NAME```
+
+```typescript
+import * as _ from 'lodash';
+import { ServiceResources, RPCHandlerBase } from 'polymetis-node';
+
+export default class Handler extends RPCHandlerBase {
+  public topic = 'fibonacci';
+
+  constructor(resources: ServiceResources) {
+    super(resources);
+  }
+
+  protected async handleCallback(data: any): Promise<any> {
+    return this.fibonacci(_.toInteger(_.get(data, 'number', '0')));
+  }
+
+  private fibonacci(n: number): number {
+    if (n === 0 || n === 1) {
+      return n;
+    }
+    return n + this.fibonacci(n - 1);
+  }
+}
+```
+
+APIRouteHandler, EventsHandler and TasksHandler define the helper method ```callRPC(service: string, procedure: string, data: any)```  that abstract the call to the remote procedure of a specific service in the same environment.
+```typescript
+    const result = await this.callRPC('math', 'fibonacci', { number });
+```
 

@@ -46,6 +46,7 @@ export default class ServiceBase {
   protected events: any;
   protected tasks: any;
   protected routes: any;
+  protected rpcs: any;
 
   constructor(conf?: Configuration) {
     let configuration: Configuration = {
@@ -83,6 +84,7 @@ export default class ServiceBase {
     this.events = {};
     this.tasks = {};
     this.routes = {};
+    this.rpcs = {};
   }
 
   async init() {
@@ -95,6 +97,9 @@ export default class ServiceBase {
     // Events & Tasks
     await this.loadEvents();
     await this.loadTasks();
+
+    // RPCs
+    await this.loadRPC();
 
     // API
     this.app.use(this.logApiRoute.bind(this));
@@ -189,6 +194,49 @@ export default class ServiceBase {
         try {
           // recurse down the directory tree
           await this.loadTasks(path.join(handlerPath, '/'));
+        } catch (error) {
+          // this.resources.logger.error(`Error Rrecursing down ${handlerPath}: ${error}`);
+        }
+      }
+    }
+  }
+
+  private async loadRPC(dir?: string) {
+    let rpcsDir: string;
+    if (dir) {
+      rpcsDir = dir;
+    } else {
+      rpcsDir = path.join(this.resources.configuration.baseDir, './rpc/');
+    }
+
+    let handlers: string[];
+    try {
+      handlers = fs.readdirSync(rpcsDir);
+    } catch (error) {
+      return;
+    }
+
+    for (const handlerName of handlers) {
+      const handlerPath = path.join(rpcsDir, handlerName);
+
+      if (_.endsWith(handlerName, '.rpc.ts')) {
+        try {
+          const handlerSpec = require(handlerPath).default;
+          const handler: HandlerBase = new handlerSpec(this.resources);
+
+          if (_.has(this.rpcs, handler.topic)) {
+            throw new Error(`Duplicated rpc listener: ${handler.topic}`);
+          }
+
+          await handler.init();
+          this.rpcs[handler.topic] = handler;
+        } catch (error) {
+          this.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
+        }
+      } else {
+        try {
+          // recurse down the directory tree
+          await this.loadRPC(path.join(handlerPath, '/'));
         } catch (error) {
           // this.resources.logger.error(`Error Rrecursing down ${handlerPath}: ${error}`);
         }
