@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import HandlerBase from '../handlers/HandlerBase';
 import { ServiceResources } from '../ServiceBase';
 
-export default abstract class EvenHandlerBase extends HandlerBase{
+export default abstract class EventHandlerBase extends HandlerBase{
   public abstract topic: string;
 
   constructor(resources: ServiceResources) {
