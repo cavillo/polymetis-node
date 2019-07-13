@@ -15,4 +15,13 @@ export default abstract class HandlerBase {
   public getName(): string {
     return `Handler ${this.topic}`;
   }
+
+  public async callRPC(service: string, procedure: string, data: any) {
+    const { environment } = this.resources.configuration.service;
+    const topic = `${environment}.${service}.rpc.${procedure}`;
+    return this.resources.rabbit.callProcedure(
+      topic,
+      data,
+    );
+  }
 }

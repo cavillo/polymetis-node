@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import HandlerBase from '../handlers/HandlerBase';
 import { ServiceResources } from '../ServiceBase';
 
-export default abstract class EventHandlerBase extends HandlerBase{
+export default abstract class RPCHandlerBase extends HandlerBase{
   public abstract topic: string;
 
   constructor(resources: ServiceResources) {
@@ -13,27 +13,24 @@ export default abstract class EventHandlerBase extends HandlerBase{
     const environment = this.resources.configuration.service.environment;
     const service = this.resources.configuration.service.service;
 
-    const queue = `${environment}.${service}.${this.topic}`;
-
-    await this.resources.rabbit.on(
-      this.topic,                        // topic
-      this.callback.bind(this),          // callback
-      queue,                             // queue
+    await this.resources.rabbit.registerProcedure(
+      `${environment}.${service}.rpc.${this.topic}`,    // topic
+      this.callback.bind(this),                         // callback
     );
 
     this.resources.logger.log(this.getName(), 'Initialized...');
   }
 
   protected async callback(payload: any) {
-    this.resources.logger.log('Handling event', this.topic);
+    this.resources.logger.log('Handling rpc', this.topic);
     const data = _.get(payload, 'content', {});
-    await this.handleCallback(data);
+    return await this.handleCallback(data);
   }
 
-  protected abstract async handleCallback(data: any): Promise<void>;
+  protected abstract async handleCallback(data: any): Promise<any>;
 
   public getName(): string {
-    return `Event Handler ${this.topic}`;
+    return `RPC Handler ${this.topic}`;
   }
 
   protected async emitTask(task: string, data: any) {

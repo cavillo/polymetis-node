@@ -17,6 +17,7 @@ import {
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
+  RPCHandlerBase,
 } from './handlers';
 
 import {
@@ -32,6 +33,7 @@ export {
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
+  RPCHandlerBase,
   ApiRoute,
   Express,
   Response,
