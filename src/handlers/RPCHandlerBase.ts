@@ -32,12 +32,4 @@ export default abstract class RPCHandlerBase extends HandlerBase{
   public getName(): string {
     return `RPC Handler ${this.topic}`;
   }
-
-  protected async emitTask(task: string, data: any) {
-    const topic = `${this.resources.configuration.service.service}.${task}`;
-    this.resources.rabbit.emit(
-      topic,
-      data,
-    );
-  }
 }
