@@ -134,8 +134,6 @@ export default class RabbitService {
     await channel.bindQueue(q.queue, this.exchangeName, procName);
     await channel.prefetch(1);
 
-    this.logger.log(procName, 'Awaiting RPC requests...');
-
     return channel.consume(q.queue, this.rpcCallback.bind(this, channel, callback));
   }
 

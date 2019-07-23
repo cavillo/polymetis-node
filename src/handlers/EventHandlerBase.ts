@@ -20,8 +20,6 @@ export default abstract class EventHandlerBase extends HandlerBase{
       this.callback.bind(this),          // callback
       queue,                             // queue
     );
-
-    this.resources.logger.log(this.getName(), 'Initialized...');
   }
 
   protected async callback(payload: any) {
@@ -31,10 +29,6 @@ export default abstract class EventHandlerBase extends HandlerBase{
   }
 
   protected abstract async handleCallback(data: any): Promise<void>;
-
-  public getName(): string {
-    return `Event Handler ${this.topic}`;
-  }
 
   protected async emitTask(task: string, data: any) {
     const topic = `${this.resources.configuration.service.service}.${task}`;

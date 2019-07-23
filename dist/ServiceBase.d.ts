@@ -21,10 +21,12 @@ export default class ServiceBase {
     protected events: any;
     protected tasks: any;
     protected routes: any;
+    protected rpcs: any;
     constructor(conf?: Configuration);
     init(): Promise<void>;
     private loadEvents;
     private loadTasks;
+    private loadRPC;
     private loadRoutes;
     private logApiRoute;
 }

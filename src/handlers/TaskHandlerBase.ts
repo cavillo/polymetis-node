@@ -20,8 +20,6 @@ export default abstract class TaskHandlerBase extends HandlerBase{
       this.callback.bind(this),          // callback
       queue,                             // queue
     );
-
-    this.resources.logger.log(this.getName(), 'Initialized...');
   }
 
   protected async callback(payload: any) {
@@ -32,7 +30,4 @@ export default abstract class TaskHandlerBase extends HandlerBase{
 
   protected abstract async handleCallback(data: any): Promise<void>;
 
-  public getName(): string {
-    return `Task Handler ${this.topic}`;
-  }
 }
