@@ -135,7 +135,6 @@ export default class ServiceBase {
       this.resources.logger.log('- No routes loaded...');
     }
 
-
     this.resources.logger.newLine();
     this.resources.logger.ok('Service initialized...');
   }
