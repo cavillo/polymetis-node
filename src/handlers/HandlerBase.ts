@@ -13,7 +13,7 @@ export default abstract class HandlerBase {
   protected abstract async handleCallback(data: any): Promise<void>;
 
   public getName(): string {
-    return `Handler ${this.topic}`;
+    return this.topic;
   }
 
   public async callRPC(service: string, procedure: string, data: any) {

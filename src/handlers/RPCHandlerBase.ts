@@ -17,8 +17,6 @@ export default abstract class RPCHandlerBase extends HandlerBase{
       `${environment}.${service}.rpc.${this.topic}`,    // topic
       this.callback.bind(this),                         // callback
     );
-
-    this.resources.logger.log(this.getName(), 'Initialized...');
   }
 
   protected async callback(payload: any) {
@@ -29,7 +27,4 @@ export default abstract class RPCHandlerBase extends HandlerBase{
 
   protected abstract async handleCallback(data: any): Promise<any>;
 
-  public getName(): string {
-    return `RPC Handler ${this.topic}`;
-  }
 }

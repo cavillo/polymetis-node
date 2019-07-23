@@ -95,23 +95,48 @@ export default class ServiceBase {
     await this.resources.pg.init();
 
     // Events & Tasks
+    this.resources.logger.newLine();
+    this.resources.logger.log('Loading service EVENTS');
     await this.loadEvents();
+    if (_.isEmpty(this.events)) {
+      this.resources.logger.log('- No events loaded...');
+    }
+
+    this.resources.logger.newLine();
+    this.resources.logger.log('Loading service TASKS');
     await this.loadTasks();
+    if (_.isEmpty(this.tasks)) {
+      this.resources.logger.log('- No tasks loaded...');
+    }
 
     // RPCs
+    this.resources.logger.newLine();
+    this.resources.logger.log('Loading service RPC\'s');
     await this.loadRPC();
-
+    if (_.isEmpty(this.rpcs)) {
+      this.resources.logger.log('- No rpcs loaded...');
+    }
     // API
+
     this.app.use(this.logApiRoute.bind(this));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
-    await this.loadRoutes();
+
     await this.app.listen(
       this.resources.configuration.api.port,
       () => this.resources.logger.log('API listening on port:', this.resources.configuration.api.port),
     );
 
+    this.resources.logger.newLine();
+    this.resources.logger.log('Loading service API ROUTES');
+    await this.loadRoutes();
+    if (_.isEmpty(this.routes)) {
+      this.resources.logger.log('- No routes loaded...');
+    }
+
+
+    this.resources.logger.newLine();
     this.resources.logger.ok('Service initialized...');
   }
 
@@ -143,6 +168,7 @@ export default class ServiceBase {
 
           await handler.init();
           this.events[handler.topic] = handler;
+          this.resources.logger.log('-', handler.getName());
         } catch (error) {
           this.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
         }
@@ -187,6 +213,7 @@ export default class ServiceBase {
 
           await handler.init();
           this.tasks[handler.topic] = handler;
+          this.resources.logger.log('-', handler.getName());
         } catch (error) {
           this.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
         }
@@ -230,6 +257,7 @@ export default class ServiceBase {
 
           await handler.init();
           this.rpcs[handler.topic] = handler;
+          this.resources.logger.log('-', handler.getName());
         } catch (error) {
           this.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
         }
@@ -297,7 +325,9 @@ export default class ServiceBase {
               this.app.delete(routeURL, routeInstance.routeCallback.bind(routeInstance));
               break;
           }
-          this.resources.logger.log('  Loaded route: ', method, routeInstance.url);
+
+          this.routes[routeInstance.url] = routeInstance;
+          this.resources.logger.log('-', `${_.toUpper(method)}`, routeInstance.url);
         } catch (error) {
           this.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
         }
