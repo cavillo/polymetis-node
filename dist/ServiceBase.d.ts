@@ -1,17 +1,12 @@
-import { Express, Request, Response } from 'express';
-import { Configuration, ServiceConfiguration, MongoConfiguration, PostgresConfiguration, RabbitConfiguration, ApiConfiguration, RedisConfiguration } from './utils/ServiceConf';
-import Rabbit from './rabbit/Rabbit';
-import Mongo from './mongo/Mongo';
-import Postgres from './postgres';
+/// <reference types="express" />
+import Rabbit from './rabbit';
 import Logger from './utils/Logger';
-import Redis from './redisService';
+import { Express } from './api';
+import { Configuration, ServiceConfiguration, RabbitConfiguration, ApiConfiguration } from './utils/ServiceConf';
 export interface ServiceResources {
     configuration: Configuration;
     rabbit: Rabbit;
     logger: Logger;
-    mongo: Mongo;
-    redis: Redis;
-    pg: Postgres;
 }
 export default class ServiceBase {
     configuration: Configuration;
@@ -24,10 +19,5 @@ export default class ServiceBase {
     protected rpcs: any;
     constructor(conf?: Configuration);
     init(): Promise<void>;
-    private loadEvents;
-    private loadTasks;
-    private loadRPC;
-    private loadRoutes;
-    private logApiRoute;
 }
-export { Configuration, Express, Response, Request, Logger, ServiceConfiguration, MongoConfiguration, PostgresConfiguration, RabbitConfiguration, ApiConfiguration, RedisConfiguration, };
+export { Configuration, Express, Logger, ServiceConfiguration, RabbitConfiguration, ApiConfiguration, };

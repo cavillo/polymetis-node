@@ -1,8 +1,8 @@
 import { ServiceBase, Configuration } from '../dist';
 
 const conf: Configuration = {
-  mongo: {
-    port: 27017,
+  api: {
+    port: 8000,
   },
 };
 const service = new ServiceBase(conf);

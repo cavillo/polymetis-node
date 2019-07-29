@@ -1,16 +1,10 @@
 import ServiceBase, {
   Configuration,
   ServiceResources,
-  Express,
-  Response,
-  Request,
   Logger,
   ServiceConfiguration,
-  MongoConfiguration,
-  PostgresConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
-  RedisConfiguration,
 } from './ServiceBase';
 
 import {
@@ -22,9 +16,11 @@ import {
 
 import {
   ApiRoute,
+  Express,
+  NextFunction,
+  Request,
+  Response,
 } from './api';
-
-import Postgres, { DatabaseInstance } from './postgres';
 
 export {
   Configuration,
@@ -36,15 +32,11 @@ export {
   RPCHandlerBase,
   ApiRoute,
   Express,
+  NextFunction,
   Response,
   Request,
-  Postgres,
   Logger,
   ServiceConfiguration,
-  MongoConfiguration,
-  PostgresConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
-  RedisConfiguration,
-  DatabaseInstance,
 };
