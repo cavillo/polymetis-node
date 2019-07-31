@@ -7,15 +7,6 @@ import EventHandlerBase from './EventHandlerBase';
 import TaskHandlerBase from './TaskHandlerBase';
 import RPCHandlerBase from './RPCHandlerBase';
 import { ServiceResources } from '../';
-export {
-  HandlerBase,
-  EventHandlerBase,
-  TaskHandlerBase,
-  RPCHandlerBase,
-  loadEvents,
-  loadTasks,
-  loadRPC,
-};
 
 const loadEvents = async (resources: ServiceResources, events: any = {}, dir?: string): Promise<any> => {
   let eventsDir: string;
@@ -45,7 +36,6 @@ const loadEvents = async (resources: ServiceResources, events: any = {}, dir?: s
 
         await handler.init();
         events[handler.topic] = handler;
-        resources.logger.log('-', handler.getName());
       } catch (error) {
         resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
@@ -91,7 +81,6 @@ const loadTasks = async (resources: ServiceResources, tasks: any = {}, dir?: str
 
         await handler.init();
         tasks[handler.topic] = handler;
-        resources.logger.log('-', handler.getName());
       } catch (error) {
         resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
@@ -137,7 +126,6 @@ const loadRPC = async (resources: ServiceResources, rpcs: any = {}, dir?: string
 
         await handler.init();
         rpcs[handler.topic] = handler;
-        resources.logger.log('-', handler.getName());
       } catch (error) {
         resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
@@ -152,4 +140,14 @@ const loadRPC = async (resources: ServiceResources, rpcs: any = {}, dir?: string
     }
   }
   return rpcs;
+};
+
+export {
+  HandlerBase,
+  EventHandlerBase,
+  TaskHandlerBase,
+  RPCHandlerBase,
+  loadEvents,
+  loadTasks,
+  loadRPC,
 };

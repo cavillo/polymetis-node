@@ -1,9 +1,7 @@
 import { Request, Response } from 'express';
-import { ServiceResources } from '../ServiceBase';
-export default abstract class RouteBase {
-    resources: ServiceResources;
+import Base from './.base';
+export default abstract class RouteBase extends Base {
     url: string;
-    constructor(resources: ServiceResources);
     routeCallback(req: Request, res: Response): Promise<any>;
     callRPC(service: string, procedure: string, data: any): Promise<unknown>;
     protected abstract callback(req: Request, res: Response): Promise<any>;

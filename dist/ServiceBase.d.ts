@@ -1,8 +1,8 @@
 /// <reference types="express" />
 import Rabbit from './rabbit';
 import Logger from './utils/Logger';
-import { Express } from './api';
-import { Configuration, ServiceConfiguration, RabbitConfiguration, ApiConfiguration } from './utils/ServiceConf';
+import { Express } from './utils/API';
+import { Configuration } from './utils/ServiceConf';
 export interface ServiceResources {
     configuration: Configuration;
     rabbit: Rabbit;
@@ -20,4 +20,3 @@ export default class ServiceBase {
     constructor(conf?: Configuration);
     init(): Promise<void>;
 }
-export { Configuration, Express, Logger, ServiceConfiguration, RabbitConfiguration, ApiConfiguration, };

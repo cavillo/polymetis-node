@@ -1,14 +1,7 @@
 import * as _ from 'lodash';
 import HandlerBase from './HandlerBase';
-import { ServiceResources } from '../ServiceBase';
 
 export default abstract class TaskHandlerBase extends HandlerBase{
-  public abstract topic: string;
-
-  constructor(resources: ServiceResources) {
-    super(resources);
-  }
-
   public async init() {
     const environment = this.resources.configuration.service.environment;
     const service = this.resources.configuration.service.service;
@@ -20,6 +13,7 @@ export default abstract class TaskHandlerBase extends HandlerBase{
       this.callback.bind(this),          // callback
       queue,                             // queue
     );
+    this.resources.logger.log('-', this.getName());
   }
 
   protected async callback(payload: any) {

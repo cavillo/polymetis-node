@@ -1,14 +1,7 @@
 import * as _ from 'lodash';
-import HandlerBase from '../handlers/HandlerBase';
-import { ServiceResources } from '../ServiceBase';
+import HandlerBase from './/HandlerBase';
 
 export default abstract class RPCHandlerBase extends HandlerBase{
-  public abstract topic: string;
-
-  constructor(resources: ServiceResources) {
-    super(resources);
-  }
-
   public async init() {
     const environment = this.resources.configuration.service.environment;
     const service = this.resources.configuration.service.service;
@@ -17,6 +10,7 @@ export default abstract class RPCHandlerBase extends HandlerBase{
       `${environment}.${service}.rpc.${this.topic}`,    // topic
       this.callback.bind(this),                         // callback
     );
+    this.resources.logger.log('-', this.getName());
   }
 
   protected async callback(payload: any) {

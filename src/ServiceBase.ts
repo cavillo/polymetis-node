@@ -9,20 +9,17 @@ import {
   Express,
   loadRoutes,
   logApiRoute,
-} from './api';
+} from './utils/API';
 import {
   loadEvents,
   loadTasks,
   loadRPC,
-} from './handlers';
+} from './base';
 import {
   serviceConf,
   rabbitConf,
   apiConf,
   Configuration,
-  ServiceConfiguration,
-  RabbitConfiguration,
-  ApiConfiguration,
 } from './utils/ServiceConf';
 
 export interface ServiceResources {
@@ -121,12 +118,3 @@ export default class ServiceBase {
     this.resources.logger.ok('Service initialized...');
   }
 }
-
-export {
-  Configuration,
-  Express,
-  Logger,
-  ServiceConfiguration,
-  RabbitConfiguration,
-  ApiConfiguration,
-};

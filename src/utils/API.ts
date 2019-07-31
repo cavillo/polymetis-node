@@ -3,7 +3,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import ApiRoute from './Route';
+import ApiRoute from '../base/RouteHandlerBase';
 import { ServiceResources } from '../';
 export {
   express,

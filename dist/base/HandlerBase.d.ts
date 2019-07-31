@@ -1,8 +1,6 @@
-import { ServiceResources } from '../ServiceBase';
-export default abstract class HandlerBase {
-    protected resources: ServiceResources;
+import Base from './.base';
+export default abstract class HandlerBase extends Base {
     abstract topic: string;
-    constructor(resources: ServiceResources);
     abstract init(): Promise<void>;
     protected abstract callback(data: any): Promise<void>;
     protected abstract handleCallback(data: any): Promise<void>;

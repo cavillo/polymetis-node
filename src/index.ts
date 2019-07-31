@@ -1,18 +1,16 @@
-import ServiceBase, {
+import {
   Configuration,
-  ServiceResources,
-  Logger,
   ServiceConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
-} from './ServiceBase';
+} from './utils/ServiceConf';
 
 import {
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
-} from './handlers';
+} from './base';
 
 import {
   ApiRoute,
@@ -20,7 +18,13 @@ import {
   NextFunction,
   Request,
   Response,
-} from './api';
+} from './utils/API';
+
+import Logger from './utils/Logger';
+
+import ServiceBase, {
+  ServiceResources,
+} from './ServiceBase';
 
 export {
   Configuration,
