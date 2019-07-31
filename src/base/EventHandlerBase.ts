@@ -13,11 +13,11 @@ export default abstract class EventHandlerBase extends HandlerBase{
       this.callback.bind(this),          // callback
       queue,                             // queue
     );
-    this.resources.logger.log('-', this.getName());
+    this.resources.logger.info('-', this.getName());
   }
 
   protected async callback(payload: any) {
-    this.resources.logger.log('Handling event', this.topic);
+    this.resources.logger.info('Handling event', this.topic);
     const data = _.get(payload, 'content', {});
     await this.handleCallback(data);
   }

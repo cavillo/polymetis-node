@@ -10,11 +10,11 @@ export default abstract class RPCHandlerBase extends HandlerBase{
       `${environment}.${service}.rpc.${this.topic}`,    // topic
       this.callback.bind(this),                         // callback
     );
-    this.resources.logger.log('-', this.getName());
+    this.resources.logger.info('-', this.getName());
   }
 
   protected async callback(payload: any) {
-    this.resources.logger.log('Handling rpc', this.topic);
+    this.resources.logger.info('Handling rpc', this.topic);
     const data = _.get(payload, 'content', {});
     return await this.handleCallback(data);
   }

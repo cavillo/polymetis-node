@@ -6,6 +6,7 @@ configureEnvironmentVariables();
 export interface ServiceConfiguration {
   environment?: string;
   service?: string;
+  loggerMode?: number;
 }
 export interface ApiConfiguration {
   port?: number;
@@ -28,6 +29,7 @@ export interface Configuration {
 export const serviceConf: ServiceConfiguration = {
   environment: _.get(process.env, 'ENVIRONMENT'),
   service: _.get(process.env, 'SERVICE'),
+  loggerMode: _.toNumber(_.get(process.env, 'LOGGER_MODE')),
 };
 export const apiConf: ApiConfiguration = {
   port: _.toNumber(_.get(process.env, 'API_PORT')),

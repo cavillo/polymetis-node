@@ -44,7 +44,7 @@ export default class RabbitService {
     const channel = await this.connect();
     if (!channel) throw new Error('Rabbit failed');
 
-    this.logger.ok('Rabbit Initialized...');
+    this.logger.info('Rabbit connection initialized...');
   }
 
   public async getChannel(): Promise<amqplib.Channel> {

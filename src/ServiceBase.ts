@@ -74,26 +74,23 @@ export default class ServiceBase {
     await this.resources.rabbit.init();
 
     // Events & Tasks
-    this.resources.logger.newLine();
-    this.resources.logger.log('Loading service EVENTS');
+    this.resources.logger.info('Loading EVENTS');
     await loadEvents(this.resources, this.events);
     if (_.isEmpty(this.events)) {
-      this.resources.logger.muted('- No events loaded...');
+      this.resources.logger.warn('- No events loaded...');
     }
 
-    this.resources.logger.newLine();
-    this.resources.logger.log('Loading service TASKS');
+    this.resources.logger.info('Loading TASKS');
     await loadTasks(this.resources, this.tasks);
     if (_.isEmpty(this.tasks)) {
-      this.resources.logger.muted('- No tasks loaded...');
+      this.resources.logger.warn('- No tasks loaded...');
     }
 
     // RPCs
-    this.resources.logger.newLine();
-    this.resources.logger.log('Loading service RPC\'s');
+    this.resources.logger.info('Loading RPC\'s');
     await loadRPC(this.resources, this.rpcs);
     if (_.isEmpty(this.rpcs)) {
-      this.resources.logger.muted('- No rpcs loaded...');
+      this.resources.logger.warn('- No rpcs loaded...');
     }
 
     // API
@@ -102,19 +99,15 @@ export default class ServiceBase {
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
 
-    await this.app.listen(
-      this.resources.configuration.api.port,
-      () => this.resources.logger.log('API listening on port:', this.resources.configuration.api.port),
-    );
-
-    this.resources.logger.newLine();
-    this.resources.logger.log('Loading service API ROUTES');
+    this.resources.logger.info('Loading API ROUTES');
     await loadRoutes(this.app, this.resources, this.routes);
     if (_.isEmpty(this.routes)) {
-      this.resources.logger.muted('- No routes loaded...');
+      this.resources.logger.warn('- No routes loaded...');
+    } else {
+      await this.app.listen(this.resources.configuration.api.port);
+      this.resources.logger.info('API listening on port:', this.resources.configuration.api.port);
     }
 
-    this.resources.logger.newLine();
-    this.resources.logger.ok('Service initialized...');
+    this.resources.logger.info('Service initialized...');
   }
 }

@@ -20,7 +20,7 @@ import {
   Response,
 } from './utils/API';
 
-import Logger from './utils/Logger';
+import Logger, { LoggerMode } from './utils/Logger';
 
 import ServiceBase, {
   ServiceResources,
@@ -40,6 +40,7 @@ export {
   Response,
   Request,
   Logger,
+  LoggerMode,
   ServiceConfiguration,
   RabbitConfiguration,
   ApiConfiguration,

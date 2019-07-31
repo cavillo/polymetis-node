@@ -1,15 +1,15 @@
-import { ServiceBase, Configuration } from '../dist';
+// import { expect } from 'chai';
+import { ServiceBase, Configuration } from '../src';
+import 'mocha';
 
 const conf: Configuration = {
-  api: {
-    port: 8000,
-  },
+  baseDir: __dirname,
 };
-const service = new ServiceBase(conf);
-service
-  .init()
-  .then(
-    () => console.log(),
-  ).catch(
-    (error: any) => service.logger.error(error),
-  );
+
+describe('Basic service', async () => {
+  it('start microservice', async () => {
+    // Initializing service
+    const service = new ServiceBase(conf);
+    await service.init();
+  });
+});

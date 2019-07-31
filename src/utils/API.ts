@@ -71,7 +71,7 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
         }
 
         routes[routeInstance.url] = routeInstance;
-        resources.logger.log('-', `${_.toUpper(method)}`, routeInstance.url);
+        resources.logger.info('-', `${_.toUpper(method)}`, routeInstance.url);
       } catch (error) {
         resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
@@ -80,14 +80,14 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
         // recurse down the directory tree
         await loadRoutes(app, resources, routes, path.join(handlerPath, '/'));
       } catch (error) {
-        // resources.logger.error(`Error Rrecursing down ${handlerPath}: ${error}`);
+        continue;
       }
     }
   }
 };
 
 const logApiRoute = (resources: ServiceResources, req: Request, res: Response, next: NextFunction) => {
-  resources.logger.log(req.method, req.originalUrl);
+  resources.logger.info(req.method, req.originalUrl);
 
   const cleanup = () => {
     res.removeListener('finish', logFinish);
@@ -101,9 +101,9 @@ const logApiRoute = (resources: ServiceResources, req: Request, res: Response, n
     } else if (res.statusCode >= 400) {
       resources.logger.error(req.method, req.originalUrl, res.statusCode);
     } else if (res.statusCode < 300 && res.statusCode >= 200) {
-      resources.logger.log(req.method, req.originalUrl, res.statusCode);
+      resources.logger.info(req.method, req.originalUrl, res.statusCode);
     } else {
-      resources.logger.log(req.method, req.originalUrl, res.statusCode);
+      resources.logger.info(req.method, req.originalUrl, res.statusCode);
     }
   };
 

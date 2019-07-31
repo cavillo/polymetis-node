@@ -1,6 +1,7 @@
 export interface ServiceConfiguration {
     environment?: string;
     service?: string;
+    loggerMode?: number;
 }
 export interface ApiConfiguration {
     port?: number;
