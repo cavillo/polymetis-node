@@ -101,26 +101,10 @@ SERVICE='email'
 
 API_PORT='8001'
 
-POSTGRES_HOST='localhost'
-POSTGRES_PORT='5432'
-POSTGRES_USERNAME='pg_user'
-POSTGRES_PASSWORD='pg_pass'
-POSTGRES_DATABASE='pg_database'
-POSTGRES_SSL='true'
-
-MONGO_URL='mongodb://localhost'
-MONGO_USERNAME='mongo_user'
-MONGO_PASSWORD='mongo_pass'
-MONGO_DATABASE='mongo_db'
-MONGO_PORT='27017'
-
 RABBITMQ_HOST='localhost'
 RABBITMQ_PORT='5672'
 RABBITMQ_USERNAME='guest'
 RABBITMQ_PASSWORD='guest'
-
-REDIS_HOST='localhost'
-REDIS_PORT='6379'
 ```
 
 ## Dir Structure
@@ -149,6 +133,11 @@ base_dir
 │   └───send
 │       │   welcome.handler.ts
 │       │   reset-password.handler.ts
+│       │   ...
+│   ....
+└───rpc
+│   └───send
+│       │   custom.rpc.ts
 │       │   ...
 │   ....
 ```
@@ -273,7 +262,7 @@ export default class Handler extends RPCHandlerBase {
 }
 ```
 
-APIRouteHandler, EventsHandler and TasksHandler define the helper method ```callRPC(service: string, procedure: string, data: any)```  that abstract the call to the remote procedure of a specific service in the same environment.
+RouteHandler, EventsHandler and TasksHandler define the helper method ```callRPC(service: string, procedure: string, data: any)```  that abstract the call to the remote procedure of a specific service in the same environment.
 ```typescript
     const result = await this.callRPC('math', 'fibonacci', { number });
 ```

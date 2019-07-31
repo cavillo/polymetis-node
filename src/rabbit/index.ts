@@ -76,7 +76,7 @@ export default class RabbitService {
   /*
     RPC
   */
-  public async callProcedure(procName: string, data: any, timeout: number = this.RPC_TIMEOUT) {
+  public async callProcedure(procName: string, data: any, timeout: number = this.RPC_TIMEOUT): Promise<any> {
     return new Promise(async (resolve, reject) => {
 
       const channel = await this.connect();

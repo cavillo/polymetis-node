@@ -78,14 +78,14 @@ export default class ServiceBase {
     this.resources.logger.log('Loading service EVENTS');
     await loadEvents(this.resources, this.events);
     if (_.isEmpty(this.events)) {
-      this.resources.logger.log('- No events loaded...');
+      this.resources.logger.muted('- No events loaded...');
     }
 
     this.resources.logger.newLine();
     this.resources.logger.log('Loading service TASKS');
     await loadTasks(this.resources, this.tasks);
     if (_.isEmpty(this.tasks)) {
-      this.resources.logger.log('- No tasks loaded...');
+      this.resources.logger.muted('- No tasks loaded...');
     }
 
     // RPCs
@@ -93,7 +93,7 @@ export default class ServiceBase {
     this.resources.logger.log('Loading service RPC\'s');
     await loadRPC(this.resources, this.rpcs);
     if (_.isEmpty(this.rpcs)) {
-      this.resources.logger.log('- No rpcs loaded...');
+      this.resources.logger.muted('- No rpcs loaded...');
     }
 
     // API
@@ -111,7 +111,7 @@ export default class ServiceBase {
     this.resources.logger.log('Loading service API ROUTES');
     await loadRoutes(this.app, this.resources, this.routes);
     if (_.isEmpty(this.routes)) {
-      this.resources.logger.log('- No routes loaded...');
+      this.resources.logger.muted('- No routes loaded...');
     }
 
     this.resources.logger.newLine();
