@@ -1,30 +1,30 @@
-import ServiceBase, {
+import {
   Configuration,
-  ServiceResources,
-  Express,
-  Response,
-  Request,
-  Logger,
   ServiceConfiguration,
-  MongoConfiguration,
-  PostgresConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
-  RedisConfiguration,
-} from './ServiceBase';
+} from './utils/ServiceConf';
 
 import {
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
-} from './handlers';
+} from './base';
 
 import {
   ApiRoute,
-} from './api';
+  Express,
+  NextFunction,
+  Request,
+  Response,
+} from './utils/API';
 
-import Postgres, { DatabaseInstance } from './postgres';
+import Logger, { LoggerMode } from './utils/Logger';
+
+import ServiceBase, {
+  ServiceResources,
+} from './ServiceBase';
 
 export {
   Configuration,
@@ -36,15 +36,12 @@ export {
   RPCHandlerBase,
   ApiRoute,
   Express,
+  NextFunction,
   Response,
   Request,
-  Postgres,
   Logger,
+  LoggerMode,
   ServiceConfiguration,
-  MongoConfiguration,
-  PostgresConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
-  RedisConfiguration,
-  DatabaseInstance,
 };

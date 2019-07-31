@@ -2,22 +2,17 @@
 
 [![Build Status](http://cloud.drone.io/api/badges/cavillo/polymetis-node/status.svg)](http://cloud.drone.io/cavillo/polymetis-node)
 
-Wrapper for building micro-services ecosystems. Polymetis creates microservices with a connection to a rabbit message broker for handling events, task and RPC; and a connection to data storages such as redis, mongodb and postgres.
+Wrapper for building micro-services. Polymetis provides a connection to a rabbit message broker for handling events, tasks & RPC's.
 
   - REST API for external or internal http consumption
   - RabbitMQ for event-task mesaging and Remote Procedure Calls
-  - Redis connection provided for pub-sub or fast storage (cache maybe)
-  - MongoDB specific collections usage per service for isolated data storage
-  - Postgres connection for persistance storage shared between services
 
-Polymetis is a boilerplate that provides a solid base for the creation of an ecosystem of isolated microservices. Eache service can implements its own functionality and coexists with other services within the same infrastucture.
+Polymetis is a boilerplate that provides a solid base for the creation of an ecosystem of isolated microservices. Each service can implements its own functionality and coexists with other services within the same infrastucture.
 Each microservice can create its own http(s) **REST API**, and its own event-task handling of events coming from the **RabitMQ** message broker.
 
 # Installation
 
-> **Note:** polymetis-node assumes your server is already running the services required for your microservices (RabbitMQ, Redis, Postgres, MongoDB).
-
-Just install the npm package
+Install the npm package
 ```bash
 $ npm install polymetis-node --save
 ```
@@ -30,28 +25,6 @@ In your server create a `docker-compose.yml` file and copy the following:
 ```yml
 version: '2'
 services:
-  postgres:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: service
-      POSTGRES_PASSWORD: service
-      POSTGRES_DB: service
-    ports:
-      - '5432:5432'
-  mongo:
-    image: 'bitnami/mongodb:latest'
-    restart: always
-    ports:
-      - '27017:27017'
-    environment:
-      - MONGODB_USERNAME=service
-      - MONGODB_PASSWORD=service
-      - MONGODB_DATABASE=service
-  redis:
-    image: 'redis:4.0-alpine'
-    ports:
-      - '6379:6379'
   rabbitmq:
     image: 'rabbitmq:3.7-management-alpine'
     ports:
@@ -128,26 +101,10 @@ SERVICE='email'
 
 API_PORT='8001'
 
-POSTGRES_HOST='localhost'
-POSTGRES_PORT='5432'
-POSTGRES_USERNAME='pg_user'
-POSTGRES_PASSWORD='pg_pass'
-POSTGRES_DATABASE='pg_database'
-POSTGRES_SSL='true'
-
-MONGO_URL='mongodb://localhost'
-MONGO_USERNAME='mongo_user'
-MONGO_PASSWORD='mongo_pass'
-MONGO_DATABASE='mongo_db'
-MONGO_PORT='27017'
-
 RABBITMQ_HOST='localhost'
 RABBITMQ_PORT='5672'
 RABBITMQ_USERNAME='guest'
 RABBITMQ_PASSWORD='guest'
-
-REDIS_HOST='localhost'
-REDIS_PORT='6379'
 ```
 
 ## Dir Structure
@@ -176,6 +133,11 @@ base_dir
 │   └───send
 │       │   welcome.handler.ts
 │       │   reset-password.handler.ts
+│       │   ...
+│   ....
+└───rpc
+│   └───send
+│       │   custom.rpc.ts
 │       │   ...
 │   ....
 ```
@@ -300,7 +262,7 @@ export default class Handler extends RPCHandlerBase {
 }
 ```
 
-APIRouteHandler, EventsHandler and TasksHandler define the helper method ```callRPC(service: string, procedure: string, data: any)```  that abstract the call to the remote procedure of a specific service in the same environment.
+RouteHandler, EventsHandler and TasksHandler define the helper method ```callRPC(service: string, procedure: string, data: any)```  that abstract the call to the remote procedure of a specific service in the same environment.
 ```typescript
     const result = await this.callRPC('math', 'fibonacci', { number });
 ```
