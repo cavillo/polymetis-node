@@ -28,11 +28,7 @@ services:
   rabbitmq:
     image: 'rabbitmq:3.7-management-alpine'
     ports:
-      - '15671:15671'
       - '15672:15672'
-      - '25672:25672'
-      - '4369:4369'
-      - '5671:5671'
       - '5672:5672'
 ```
 Finally start your polymetis-node
@@ -50,35 +46,16 @@ const conf: Configuration = {
   service: {
     environment: 'local',
     service: 'email',
+    loggerMode: '0',
   },
   api: {
     port: 8001,
-  },
-  mongo: {
-    auth: {
-      user: 'mongo_user',
-      password: 'mongo_pass',
-    },
-    dbName: 'mongo_db',
-    port: 27017,
-    url: 'mongodb://localhost',
-  },
-  postgres: {
-    database: 'pg_database',
-    user: 'pg_user',
-    password: 'pg_pass',
-    port: 5432,
-    ssl: true,
   },
   rabbit: {
     host: '',
     port: 5672,
     username: 'guest',
     password: 'guest',
-  },
-  redis: {
-    host: 'localhost',
-    port: 6379,
   },
 };
 
@@ -220,8 +197,6 @@ export default class Handler extends TaskHandlerBase {
 
   protected async handleCallback(data: any): Promise<void> {
     this.resources.logger.log('Checking healthz...');
-    this.resources.logger.log('=> Logger status...', 'ok');
-    this.resources.logger.log('=> Mongo status...', await this.resources.mongo.isConnected());
     this.resources.logger.log('=> Check finished...');
   }
 }
