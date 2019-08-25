@@ -2,16 +2,14 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
-    "lib": [
-      "es6",
-      "dom"
-    ],
+    "lib": ["es6","dom"],
     "outDir": "dist",
-    "baseUrl": "src",
+    "baseUrl" : "src",
     "rootDir": "src",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "paths": {},
+    "paths": {
+    },
     "inlineSources": true,
     "inlineSourceMap": true,
     "declaration": true,

@@ -5,6 +5,7 @@ export interface ServiceConfiguration {
 }
 export interface ApiConfiguration {
     port?: number;
+    prefix?: string;
 }
 export interface RabbitConfiguration {
     host?: string;

@@ -52,7 +52,7 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
         const routeClass = require(handlerPath).default;
         const routeInstance: ApiRoute = new routeClass(resources);
 
-        const apiPrefix = '/api';
+        const apiPrefix = resources.configuration.api.prefix;
         const routeURL = `${apiPrefix}${routeInstance.url}`;
 
         switch (method) {
