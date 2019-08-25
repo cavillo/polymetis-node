@@ -10,6 +10,7 @@ export interface ServiceConfiguration {
 }
 export interface ApiConfiguration {
   port?: number;
+  prefix?: string;
 }
 export interface RabbitConfiguration {
   host?: string;
@@ -33,6 +34,7 @@ export const serviceConf: ServiceConfiguration = {
 };
 export const apiConf: ApiConfiguration = {
   port: _.toNumber(_.get(process.env, 'API_PORT')),
+  prefix: '/api',
 };
 export const rabbitConf: RabbitConfiguration = {
   username: _.get(process.env, 'RABBITMQ_USERNAME'),

@@ -104,9 +104,9 @@ export default class ServiceBase {
     if (_.isEmpty(this.routes)) {
       this.resources.logger.warn('- No routes loaded...');
     } else {
-      await this.app.listen(this.resources.configuration.api.port);
       this.resources.logger.info('API listening on port:', this.resources.configuration.api.port);
     }
+    await this.app.listen(this.resources.configuration.api.port);
 
     this.resources.logger.info('Service initialized...');
   }
