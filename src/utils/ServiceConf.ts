@@ -34,7 +34,7 @@ export const serviceConf: ServiceConfiguration = {
 };
 export const apiConf: ApiConfiguration = {
   port: _.toNumber(_.get(process.env, 'API_PORT')),
-  prefix: '/api',
+  prefix: _.get(process.env, 'API_PREFIX'),
 };
 export const rabbitConf: RabbitConfiguration = {
   username: _.get(process.env, 'RABBITMQ_USERNAME'),
