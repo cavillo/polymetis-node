@@ -16,7 +16,8 @@ export {
   logApiRoute,
 };
 
-const loadRoutes = async (app: Express, resources: ServiceResources, routes: any = {}, dir ?: string) => {
+const loadRoutes = async (app: Express, resources: ServiceResources, routes: any = {}, dir?: string) => {
+  const apiPrefix = _.get(resources, 'configuration.api.prefix', '/api');
   const trustedEndpoints = ['get', 'delete', 'put', 'post'];
   let routesDir: string;
   if (dir) {
@@ -52,7 +53,6 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
         const routeClass = require(handlerPath).default;
         const routeInstance: ApiRoute = new routeClass(resources);
 
-        const apiPrefix = resources.configuration.api.prefix;
         const routeURL = `${apiPrefix}${routeInstance.url}`;
 
         switch (method) {
