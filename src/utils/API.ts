@@ -17,7 +17,7 @@ export {
 };
 
 const loadRoutes = async (app: Express, resources: ServiceResources, routes: any = {}, dir?: string) => {
-  const apiPrefix = _.get(resources, 'configuration.api.prefix', '/api');
+  const apiBaseRoute = _.isEmpty(resources.configuration.api.baseRoute) ? '' : resources.configuration.api.baseRoute;
   const trustedEndpoints = ['get', 'delete', 'put', 'post'];
   let routesDir: string;
   if (dir) {
@@ -53,7 +53,7 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
         const routeClass = require(handlerPath).default;
         const routeInstance: ApiRoute = new routeClass(resources);
 
-        const routeURL = `${apiPrefix}${routeInstance.url}`;
+        const routeURL = `${apiBaseRoute}${routeInstance.url}`;
 
         switch (method) {
           case 'get':
@@ -71,7 +71,7 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
         }
 
         routes[routeInstance.url] = routeInstance;
-        resources.logger.info('-', `${_.toUpper(method)}`, routeInstance.url);
+        resources.logger.info('-', `${_.toUpper(method)}`, routeURL);
       } catch (error) {
         resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
