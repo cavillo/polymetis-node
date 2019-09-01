@@ -28,6 +28,6 @@
   "dependencies": {
     "dotenv": "^6.1.0",
     "lodash": "^4.17.13",
-    "polymetis-node": "1.1.3"
+    "polymetis-node": "1.1.6"
   }
 }
