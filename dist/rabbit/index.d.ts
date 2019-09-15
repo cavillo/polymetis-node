@@ -8,7 +8,6 @@ export default class RabbitService {
     private connection?;
     private channel?;
     private url;
-    private queueName;
     private exchangeName;
     constructor(conf: RabbitConfiguration, logger: Logger);
     isConnected(): boolean;
