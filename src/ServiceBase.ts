@@ -72,41 +72,47 @@ export default class ServiceBase {
   async init() {
     // Initialize rabbit
     await this.resources.rabbit.init();
+  }
 
-    // Events & Tasks
-    this.resources.logger.info('Loading EVENTS');
-    await loadEvents(this.resources, this.events);
-    if (_.isEmpty(this.events)) {
-      this.resources.logger.warn('- No events loaded...');
-    }
-
+  async initTasks() {
     this.resources.logger.info('Loading TASKS');
     await loadTasks(this.resources, this.tasks);
     if (_.isEmpty(this.tasks)) {
       this.resources.logger.warn('- No tasks loaded...');
     }
+    this.resources.logger.info('Tasks initialized');
+  }
 
-    // RPCs
+  async initEvents() {
+    this.resources.logger.info('Loading EVENTS');
+    await loadEvents(this.resources, this.events);
+    if (_.isEmpty(this.events)) {
+      this.resources.logger.warn('- No events loaded...');
+    }
+    this.resources.logger.info('Events initialized');
+  }
+
+  async initRPCs() {
     this.resources.logger.info('Loading RPC\'s');
     await loadRPC(this.resources, this.rpcs);
     if (_.isEmpty(this.rpcs)) {
-      this.resources.logger.warn('- No rpcs loaded...');
+      this.resources.logger.warn('- No RPC\'s loaded...');
     }
+    this.resources.logger.info('RPC\'s initialized');
+  }
 
-    // API
+  async initAPI() {
     this.app.use(logApiRoute.bind(this, this.resources));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
 
-    this.resources.logger.info('Loading API ROUTES');
+    this.resources.logger.info('Loading API routes');
     await loadRoutes(this.app, this.resources, this.routes);
     if (_.isEmpty(this.routes)) {
       this.resources.logger.warn('- No routes loaded...');
     }
-    this.resources.logger.info('API listening on port:', this.resources.configuration.api.port);
     await this.app.listen(this.resources.configuration.api.port);
-
-    this.resources.logger.info('Service initialized...');
+    this.resources.logger.info('API initialized on port', this.resources.configuration.api.port);
   }
 }
