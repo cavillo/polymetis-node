@@ -40,6 +40,8 @@ $ docker-compose up --build --detach
 
 ```typescript
 import { ServiceBase, Configuration } from 'polymetis-node';
+import * as bodyParser from 'body-parser';
+import cors from 'cors';
 
 const conf: Configuration = {
   baseDir: __dirname,
@@ -60,28 +62,45 @@ const conf: Configuration = {
 };
 
 const service = new ServiceBase(conf);
-service
-  .init()
-  .then(
-    () => console.log(),
-  ).catch(
-    (error: any) => service.logger.error(error),
-  );
+service.init()
+  .then(async () => {
+    await service.initTasks();
+    await service.initEvents();
+    await service.initRPCs();
+
+    service.app.use(bodyParser.json());
+    service.app.use(bodyParser.urlencoded({ extended: false }));
+    service.app.use(cors());
+    await service.initAPI();
+
+    service.logger.info('Initialized...');
+  })
+  .catch((error) => {
+    service.logger.error('Exiting:', error);
+  });
 
 ```
 
 ## ENV configuration
 Another way to configure the service is via ```.env``` file. Polymetis will take all the information with the following form:
 ```bash
-ENVIRONMENT='local'
-SERVICE='email'
+# Service
+ENVIRONMENT='test'
+SERVICE='service'
 
-API_PORT='8001'
+# Logger mode
+# ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
+LOGGER_MODE='0'
 
-RABBITMQ_HOST='localhost'
-RABBITMQ_PORT='5672'
+# API
+API_PORT='7002'
+API_BASE_ROUTE='/api'
+
+# RabbitMQ
 RABBITMQ_USERNAME='guest'
 RABBITMQ_PASSWORD='guest'
+RABBITMQ_HOST='localhost'
+RABBITMQ_PORT='5672'
 ```
 
 ## Dir Structure
