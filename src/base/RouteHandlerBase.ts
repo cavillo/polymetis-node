@@ -41,36 +41,11 @@ export default abstract class RouteBase extends Base {
   */
   protected abstract async callback(req: Request, res: Response): Promise<any>;
 
-  protected async requireAuthentication(req: Request): Promise<any> {
-    // Requiring token in Authorization header in the format
-    // Authorization: Bearer #accessToken#
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      throw Error('No authorization header provided');
-    }
+  protected async detectKnownErrors(error: Error, res: Response) {
+    const message = _.get(error, 'message', 'Unknown error');
+    const statusCode = _.get(error, 'statusCode', 500);
 
-    const authSplit = authHeader.split(' ');
-
-    if (authSplit.length !== 2) {
-      throw Error('Malformed authentication header. \'Bearer accessToken\' syntax expected');
-    } else if (authSplit[0].toLowerCase() !== 'bearer') {
-      throw Error('\'Bearer\' keyword missing from front of authorization header');
-    }
-
-    const accessToken = authSplit[1];
-    try {
-      this.resources.logger.warn('TODO', 'validating token...', accessToken);
-    } catch (error) {
-      throw Error('Invalid token');
-    }
-    return;
-  }
-
-  protected async detectKnownErrors(thrownError: Error, httpResponse: Response) {
-    const message = _.get(thrownError, 'message', 'Unknown error');
-    const statusCode = _.get(thrownError, 'statusCode', 500);
-
-    this.resources.logger.error(statusCode, message, JSON.stringify(thrownError));
-    return httpResponse.status(statusCode).send(message);
+    this.resources.logger.error(statusCode, message, JSON.stringify(error));
+    return res.status(statusCode).send(message);
   }
 }

@@ -19,4 +19,8 @@ export default class ServiceBase {
     protected rpcs: any;
     constructor(conf?: Configuration);
     init(): Promise<void>;
+    initTasks(): Promise<void>;
+    initEvents(): Promise<void>;
+    initRPCs(): Promise<void>;
+    initAPI(): Promise<void>;
 }

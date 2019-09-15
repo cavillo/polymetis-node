@@ -5,6 +5,5 @@ export default abstract class RouteBase extends Base {
     routeCallback(req: Request, res: Response): Promise<any>;
     callRPC(service: string, procedure: string, data: any): Promise<any>;
     protected abstract callback(req: Request, res: Response): Promise<any>;
-    protected requireAuthentication(req: Request): Promise<any>;
-    protected detectKnownErrors(thrownError: Error, httpResponse: Response): Promise<import("express-serve-static-core").Response>;
+    protected detectKnownErrors(error: Error, res: Response): Promise<import("express-serve-static-core").Response>;
 }

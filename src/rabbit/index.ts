@@ -9,7 +9,6 @@ export default class RabbitService {
   private connection?: amqplib.Connection;
   private channel?: amqplib.Channel;
   private url: string;
-  private queueName: string;
   private exchangeName: string;
 
   constructor(protected conf: RabbitConfiguration, protected logger: Logger) {
@@ -18,9 +17,7 @@ export default class RabbitService {
     const host = conf.host;
     const port = conf.port;
 
-    this.queueName = conf.exchange;
     this.exchangeName = conf.exchange;
-    this.queueName = conf.queue || '';
     this.url = `amqp://${username}:${password}@${host}:${port}`;
   }
 
@@ -57,7 +54,7 @@ export default class RabbitService {
     }
     const channel = await this.connect();
     if (!channel) return;
-    const q = await channel.assertQueue(queueName, { exclusive: true });
+    const q = await channel.assertQueue(queueName);
     await channel.assertExchange(this.exchangeName, 'topic', { durable: false });
     await channel.bindQueue(q.queue, this.exchangeName, routingKey);
     await channel.prefetch(1);
