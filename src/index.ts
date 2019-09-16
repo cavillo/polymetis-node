@@ -3,6 +3,10 @@ import {
   ServiceConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
+  serviceConf,
+  apiConf,
+  rabbitConf,
+  configuration,
 } from './utils/ServiceConf';
 
 import {
@@ -44,4 +48,8 @@ export {
   ServiceConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
+  serviceConf,
+  apiConf,
+  rabbitConf,
+  configuration,
 };
