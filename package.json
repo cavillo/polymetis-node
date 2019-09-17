@@ -1,6 +1,6 @@
 {
   "name": "polymetis-node",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Wrapper for building micro-services. Polymetis provides a connection to a rabbit message broker for handling events, tasks & RPC's.",
   "main": "dist/index.js",
   "scripts": {
