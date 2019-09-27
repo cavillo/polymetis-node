@@ -1,18 +1,14 @@
 import * as _ from 'lodash';
-import { ServiceBase } from '../dist';
+import { ServiceBase, Configuration } from '../dist';
 
-const service = new ServiceBase();
+// Initializing service
+const configuration: Configuration = {
+  baseDir: __dirname,
+};
+const service = new ServiceBase({ configuration });
 service.init()
   .then(() => {
-    service.logger.log('Initialized...');
-
-    // arbitraty heartbeath interval for kubernetes pod to run
-    setInterval(
-      () => {
-        service.logger.muted('.');
-      },
-      30000,
-    );
+    service.logger.info('Initialized...');
   })
   .catch((error) => {
     service.logger.error('Exiting:', error);

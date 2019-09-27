@@ -9,10 +9,12 @@ export declare enum LoggerMode {
 }
 export default class Logger {
     protected conf: ServiceConfiguration;
-    constructor(conf: ServiceConfiguration);
-    private getPrefix;
+    protected callback: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null;
+    constructor(conf: ServiceConfiguration, callback?: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null);
+    setLoggerCalback(callback: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null): void;
     debug(...args: any): void;
     info(...args: any): void;
     warn(...args: any): void;
     error(...args: any): void;
+    private log;
 }

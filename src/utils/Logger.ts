@@ -1,6 +1,7 @@
-import { ServiceConfiguration } from './ServiceConf';
 import moment from 'moment';
 import chalk from 'chalk';
+
+import { ServiceConfiguration } from './ServiceConf';
 
 export enum LoggerMode {
   ALL,
@@ -12,58 +13,73 @@ export enum LoggerMode {
 }
 
 export default class Logger {
-  constructor(protected conf: ServiceConfiguration) {}
+  constructor(
+    protected conf: ServiceConfiguration,
+    protected callback: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null = null,
+  ) {}
 
-  private getPrefix(mode: LoggerMode): string {
-    let modeStr = '[ALL]  ';
-    switch (mode) {
-      case LoggerMode.ALL:
-        modeStr = '[ALL]  ';
-        break;
-      case LoggerMode.DEBUG:
-        modeStr = '[DEBUG]';
-        break;
-      case LoggerMode.INFO:
-        modeStr = '[INFO] ';
-        break;
-      case LoggerMode.WARN:
-        modeStr = '[WARN] ';
-        break;
-      case LoggerMode.ERROR:
-        modeStr = '[ERROR]';
-        break;
-      case LoggerMode.OFF:
-        modeStr = '[OFF]  ';
-        break;
-    }
-    return `[${this.conf.environment}::${this.conf.service}] [${moment().format('YYYY-MM-DD HH:mm:ss:SSS')}] ${modeStr}`;
+  public setLoggerCalback(
+    callback: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null,
+  ) {
+    this.callback = callback;
   }
 
   public debug(...args: any) {
     if (this.conf.loggerMode <= LoggerMode.DEBUG) {
-      // print gray
-      console.log(chalk.gray(this.getPrefix(LoggerMode.DEBUG)), ...args);
+      this.log(LoggerMode.DEBUG, ...args);
     }
   }
 
   public info(...args: any) {
     if (this.conf.loggerMode <= LoggerMode.INFO) {
-      // print white
-      console.log(this.getPrefix(LoggerMode.INFO), ...args);
+      this.log(LoggerMode.INFO, ...args);
     }
   }
 
   public warn(...args: any) {
     if (this.conf.loggerMode <= LoggerMode.WARN) {
-      // print yellow
-      console.log(chalk.yellow(this.getPrefix(LoggerMode.WARN)), ...args);
+      this.log(LoggerMode.WARN, ...args);
     }
   }
 
   public error(...args: any) {
     if (this.conf.loggerMode <= LoggerMode.ERROR) {
-      // print red
-      console.log(chalk.red(this.getPrefix(LoggerMode.ERROR)), ...args);
+      this.log(LoggerMode.ERROR, ...args);
+    }
+  }
+
+  private log(mode: LoggerMode, ...args: any) {
+    let modeLabel = 'LOG';
+    let modeChalk = chalk.white;
+
+    switch (mode) {
+      case LoggerMode.DEBUG:
+        modeLabel = 'DEBUG';
+        modeChalk = chalk.gray;
+        break;
+      case LoggerMode.INFO:
+        modeLabel = 'INFO';
+        modeChalk = chalk.white;
+        break;
+      case LoggerMode.WARN:
+        modeLabel = 'WARN';
+        modeChalk = chalk.yellow;
+        break;
+      case LoggerMode.ERROR:
+        modeLabel = 'ERROR';
+        modeChalk = chalk.red;
+        break;
+    }
+
+    const prefix = `[${this.conf.environment}::${this.conf.service}] [${moment().format('YYYY-MM-DD HH:mm:ss:SSS')}] [${modeLabel}]`;
+    console.log(modeChalk(prefix), ...args);
+
+    if (this.callback) {
+      try {
+        this.callback(modeLabel, ...args);
+      } catch (error) {
+        this.error('Error in Logger callback', error);
+      }
     }
   }
 }
