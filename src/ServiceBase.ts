@@ -28,6 +28,11 @@ export interface ServiceResources {
   logger: Logger;
 }
 
+export interface ServiceOptions {
+  configuration?: Configuration;
+  loggerCallback?: Function | null;
+}
+
 export default class ServiceBase {
   public configuration: Configuration;
   public logger: Logger;
@@ -39,13 +44,17 @@ export default class ServiceBase {
   protected routes: any;
   protected rpcs: any;
 
-  constructor(conf?: Configuration) {
+  constructor(opts?: ServiceOptions) {
+    const conf = _.get(opts, 'configuration', null);
+    const loggerCallback = _.get(opts, 'loggerCallback', null);
+
     let configuration: Configuration = {
       baseDir: __dirname,
       service: serviceConf,
       rabbit: rabbitConf,
       api: apiConf,
     };
+
     if (conf) {
       configuration = _.merge(
         configuration,
@@ -53,7 +62,7 @@ export default class ServiceBase {
       );
     }
     this.configuration = configuration;
-    this.logger = new Logger(configuration.service);
+    this.logger = new Logger(configuration.service, loggerCallback);
     const rabbit = new Rabbit(configuration.rabbit, this.logger);
     this.resources = {
       configuration,
