@@ -80,7 +80,7 @@ export default class RabbitService {
   /*
     RPC
   */
-  public async callProcedure(procName: string, data: any, timeout: number = this.RPC_TIMEOUT): Promise<any> {
+  public async callProcedure(procName: string, data: any, timeout: number = this.RPC_TIMEOUT): Promise<RPCResponsePayload> {
     return new Promise(async (resolve, reject) => {
       const correlationId = this.generateUuid();
 

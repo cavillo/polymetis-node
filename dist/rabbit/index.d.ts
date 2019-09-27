@@ -21,7 +21,7 @@ export default class RabbitService {
     getChannel(): Promise<amqplib.Channel>;
     on(routingKey: string, callback: any, queueName?: string): Promise<amqplib.Replies.Consume>;
     emit(routingKey: string, data: any): Promise<void>;
-    callProcedure(procName: string, data: any, timeout?: number): Promise<any>;
+    callProcedure(procName: string, data: any, timeout?: number): Promise<RPCResponsePayload>;
     registerProcedure(procName: string, callback: any): Promise<amqplib.Replies.Consume>;
     private connect;
     private rpcCallback;
