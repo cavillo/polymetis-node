@@ -4,6 +4,13 @@ import { RabbitConfiguration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
 import { clearTimeout } from 'timers';
 
+export interface RPCResponsePayload {
+  transactionId: string;
+  data?: any | null;
+  error?: string | null;
+  status: 'ok' | 'error' | 'timeout';
+}
+
 export default class RabbitService {
   private RPC_TIMEOUT = 5000;
   private connection?: amqplib.Connection;
@@ -75,19 +82,32 @@ export default class RabbitService {
   */
   public async callProcedure(procName: string, data: any, timeout: number = this.RPC_TIMEOUT): Promise<any> {
     return new Promise(async (resolve, reject) => {
+      const correlationId = this.generateUuid();
 
       const channel = await this.connect();
-      if (!channel) return;
-      await channel.assertExchange(this.exchangeName, 'topic', { durable: false });
+      if (!channel) {
+        const payload: RPCResponsePayload = {
+          transactionId: correlationId,
+          error: 'RabbitMQ Connection error',
+          status: 'error',
+        };
 
-      const correlationId = this.generateUuid();
+        return reject(payload);
+      }
+      await channel.assertExchange(this.exchangeName, 'topic', { durable: false });
 
       const q = await channel.assertQueue(`${correlationId}.${procName}`, { exclusive: true });
 
       const timeoutId = setTimeout(
         () => {
           this.logger.error('RPC timeout...');
-          return reject('timeout');
+          const payload: RPCResponsePayload = {
+            transactionId: correlationId,
+            error: 'RPC Timeout',
+            status: 'timeout',
+          };
+
+          return reject(payload);
         },
         timeout,
       );
@@ -96,9 +116,28 @@ export default class RabbitService {
         q.queue,
         (msg: any) => {
           if (msg.properties.correlationId === correlationId) {
-            const content = JSON.parse(msg.content.toString());
             clearTimeout(timeoutId);
-            return resolve(content);
+
+            try {
+              const content = JSON.parse(msg.content.toString());
+
+              const payload: RPCResponsePayload = {
+                transactionId: correlationId,
+                error: _.get(content, 'error', null),
+                status: _.get(content, 'result', null) === 'error' ? 'error' : 'ok',
+                data: _.get(content, 'data', null),
+              };
+
+              return resolve(payload);
+            } catch (error) {
+              const payload: RPCResponsePayload = {
+                transactionId: correlationId,
+                status: 'timeout',
+                error: _.toString(error),
+              };
+
+              return reject(payload);
+            }
           }
         },
         { noAck: true },
@@ -112,7 +151,6 @@ export default class RabbitService {
           replyTo: q.queue,
         },
       );
-
     });
   }
 

@@ -1,6 +1,12 @@
 import amqplib from 'amqplib';
 import { RabbitConfiguration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
+export interface RPCResponsePayload {
+    transactionId: string;
+    data?: any | null;
+    error?: string | null;
+    status: 'ok' | 'error' | 'timeout';
+}
 export default class RabbitService {
     protected conf: RabbitConfiguration;
     protected logger: Logger;

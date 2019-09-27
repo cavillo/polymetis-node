@@ -8,6 +8,10 @@ export interface ServiceResources {
     rabbit: Rabbit;
     logger: Logger;
 }
+export interface ServiceOptions {
+    configuration?: Configuration;
+    loggerCallback?: Function | null;
+}
 export default class ServiceBase {
     configuration: Configuration;
     logger: Logger;
@@ -17,7 +21,7 @@ export default class ServiceBase {
     protected tasks: any;
     protected routes: any;
     protected rpcs: any;
-    constructor(conf?: Configuration);
+    constructor(opts?: ServiceOptions);
     init(): Promise<void>;
     initTasks(): Promise<void>;
     initEvents(): Promise<void>;
