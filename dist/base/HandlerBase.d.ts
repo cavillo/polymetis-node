@@ -5,5 +5,5 @@ export default abstract class HandlerBase extends Base {
     protected abstract callback(data: any): Promise<void>;
     protected abstract handleCallback(data: any): Promise<void>;
     getName(): string;
-    callRPC(service: string, procedure: string, data: any): Promise<any>;
+    callRPC(service: string, procedure: string, data: any): Promise<import("../rabbit").RPCResponsePayload>;
 }
