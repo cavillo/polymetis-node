@@ -1,5 +1,4 @@
 import Base from './.base';
-import { RPCResponsePayload } from '../rabbit';
 
 export default abstract class HandlerBase extends Base {
   public abstract topic: string;
