@@ -21,18 +21,6 @@ export default abstract class RouteBase extends Base {
   }
 
   /*
-  Method to call remote procedures in other services
-  */
-  public async callRPC(service: string, procedure: string, data: any) {
-    const { environment } = this.resources.configuration.service;
-    const topic = `${environment}.${service}.rpc.${procedure}`;
-    return this.resources.rabbit.callProcedure(
-      topic,
-      data,
-    );
-  }
-
-  /*
   Method to implement when adding an endpoint.
   Each RouteImpl should place the logic of the
   ExpressJS callback methods in here. The handling
