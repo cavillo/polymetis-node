@@ -11,7 +11,7 @@ export default abstract class HandlerBase extends Base {
     return this.topic;
   }
 
-  public async callRPC(service: string, procedure: string, data: any): Promise<RPCResponsePayload> {
+  public async callRPC(service: string, procedure: string, data: any) {
     const { environment } = this.resources.configuration.service;
     const topic = `${environment}.${service}.rpc.${procedure}`;
     return this.resources.rabbit.callProcedure(
