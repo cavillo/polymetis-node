@@ -1,9 +1,16 @@
-import { ServiceResources } from '../';
+import { ServiceResources } from '..';
 import { RPCResponsePayload } from '../rabbit';
 
 export default abstract class Base {
   constructor(protected resources: ServiceResources) {
     this.resources = resources;
+  }
+
+  public async emitEvent(topic: string, data: any) {
+    return this.resources.rabbit.emit(
+      topic,
+      data,
+    );
   }
 
   public async callRPC(service: string, procedure: string, data: any): Promise<RPCResponsePayload> {

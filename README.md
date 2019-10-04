@@ -43,7 +43,7 @@ import { ServiceBase, Configuration } from 'polymetis-node';
 import * as bodyParser from 'body-parser';
 import cors from 'cors';
 
-const conf: Configuration = {
+const configuration: Configuration = {
   baseDir: __dirname,
   service: {
     environment: 'local',
@@ -61,7 +61,7 @@ const conf: Configuration = {
   },
 };
 
-const service = new ServiceBase(conf);
+const service = new ServiceBase({ configuration });
 service.init()
   .then(async () => {
     await service.initTasks();

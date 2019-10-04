@@ -1,4 +1,4 @@
-import Base from './.base';
+import Base from './Base';
 
 export default abstract class HandlerBase extends Base {
   public abstract topic: string;

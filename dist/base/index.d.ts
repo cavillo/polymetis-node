@@ -1,3 +1,4 @@
+import Base from './Base';
 import HandlerBase from './HandlerBase';
 import EventHandlerBase from './EventHandlerBase';
 import TaskHandlerBase from './TaskHandlerBase';
@@ -6,4 +7,4 @@ import { ServiceResources } from '../';
 declare const loadEvents: (resources: ServiceResources, events?: any, dir?: string) => Promise<any>;
 declare const loadTasks: (resources: ServiceResources, tasks?: any, dir?: string) => Promise<any>;
 declare const loadRPC: (resources: ServiceResources, rpcs?: any, dir?: string) => Promise<any>;
-export { HandlerBase, EventHandlerBase, TaskHandlerBase, RPCHandlerBase, loadEvents, loadTasks, loadRPC, };
+export { Base, HandlerBase, EventHandlerBase, TaskHandlerBase, RPCHandlerBase, loadEvents, loadTasks, loadRPC, };

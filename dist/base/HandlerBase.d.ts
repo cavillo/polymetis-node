@@ -1,4 +1,4 @@
-import Base from './.base';
+import Base from './Base';
 export default abstract class HandlerBase extends Base {
     abstract topic: string;
     abstract init(): Promise<void>;
