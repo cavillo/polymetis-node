@@ -1,6 +1,6 @@
 import { ServiceResources } from '..';
 import { RPCResponsePayload } from '../rabbit';
-export default abstract class Base {
+export default class Base {
     protected resources: ServiceResources;
     constructor(resources: ServiceResources);
     emitEvent(topic: string, data: any): Promise<void>;
