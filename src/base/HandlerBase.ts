@@ -1,4 +1,4 @@
-import Base from './.base';
+import Base from './Base';
 
 export default abstract class HandlerBase extends Base {
   public abstract topic: string;
@@ -10,4 +10,12 @@ export default abstract class HandlerBase extends Base {
     return this.topic;
   }
 
+  public async callRPC(service: string, procedure: string, data: any) {
+    const { environment } = this.resources.configuration.service;
+    const topic = `${environment}.${service}.rpc.${procedure}`;
+    return this.resources.rabbit.callProcedure(
+      topic,
+      data,
+    );
+  }
 }
