@@ -1,7 +1,7 @@
 import { ServiceResources } from '..';
 import { RPCResponsePayload } from '../rabbit';
 
-export default abstract class Base {
+export default class Base {
   constructor(protected resources: ServiceResources) {
     this.resources = resources;
   }
