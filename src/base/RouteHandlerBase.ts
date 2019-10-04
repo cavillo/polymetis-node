@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 
 // internal dependencies
-import Base from './.base';
+import Base from './Base';
 
 export default abstract class RouteBase extends Base {
   public url: string;
