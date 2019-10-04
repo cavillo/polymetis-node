@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import Base from './Base';
 import HandlerBase from './HandlerBase';
 import EventHandlerBase from './EventHandlerBase';
 import TaskHandlerBase from './TaskHandlerBase';
@@ -143,6 +144,7 @@ const loadRPC = async (resources: ServiceResources, rpcs: any = {}, dir?: string
 };
 
 export {
+  Base,
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,

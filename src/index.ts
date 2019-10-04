@@ -10,6 +10,7 @@ import {
 } from './utils/ServiceConf';
 
 import {
+  Base,
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
@@ -34,6 +35,7 @@ export {
   Configuration,
   ServiceResources,
   ServiceBase,
+  Base,
   HandlerBase,
   EventHandlerBase,
   TaskHandlerBase,

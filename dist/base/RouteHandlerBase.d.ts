@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import Base from './.base';
+import Base from './Base';
 export default abstract class RouteBase extends Base {
     url: string;
     routeCallback(req: Request, res: Response): Promise<any>;
