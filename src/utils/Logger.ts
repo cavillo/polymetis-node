@@ -7,8 +7,9 @@ export enum LoggerMode {
   ALL,
   DEBUG,
   INFO,
-  WARN,
+  WARNING,
   ERROR,
+  CRITICAL,
   OFF,
 }
 
@@ -37,14 +38,20 @@ export default class Logger {
   }
 
   public warn(...args: any) {
-    if (this.conf.loggerMode <= LoggerMode.WARN) {
-      this.log(LoggerMode.WARN, ...args);
+    if (this.conf.loggerMode <= LoggerMode.WARNING) {
+      this.log(LoggerMode.WARNING, ...args);
     }
   }
 
   public error(...args: any) {
     if (this.conf.loggerMode <= LoggerMode.ERROR) {
       this.log(LoggerMode.ERROR, ...args);
+    }
+  }
+
+  public critical(...args: any) {
+    if (this.conf.loggerMode <= LoggerMode.CRITICAL) {
+      this.log(LoggerMode.CRITICAL, ...args);
     }
   }
 
@@ -61,12 +68,16 @@ export default class Logger {
         modeLabel = 'INFO';
         modeChalk = chalk.white;
         break;
-      case LoggerMode.WARN:
-        modeLabel = 'WARN';
+      case LoggerMode.WARNING:
+        modeLabel = 'WARNING';
         modeChalk = chalk.yellow;
         break;
       case LoggerMode.ERROR:
         modeLabel = 'ERROR';
+        modeChalk = chalk.red;
+        break;
+      case LoggerMode.CRITICAL:
+        modeLabel = 'CRITICAL';
         modeChalk = chalk.red;
         break;
     }

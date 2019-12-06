@@ -1,29 +1,22 @@
-# polymetis-node
+# Fibonacci Example
 
-[![Build Status](http://cloud.drone.io/api/badges/cavillo/polymetis-node/status.svg)](http://cloud.drone.io/cavillo/polymetis-node)
+The most over complicated and inefficient fibonacci calculator of all time.
 
-Framework for developing micro-services.
-Polymetis is a tool that provides a solid base for the creation of an ecosystem of distributed and loosely coupled microservices.
+![](./fib-example-general.png)
 
-![](./docs/general.png)
+## Topics
 
-## Features
+- Simple Event-Driven Design
+- Scalable Fibonacci service
+- API service
+- Use of light RPC's
 
-- Event-Driven Design
-- Loosely Coupled
-- REST API
-- RPC's
 
-# Installation
+## Infrastructure
 
-Install the npm package
-```bash
-$ npm install polymetis-node --save
-```
-
-## Requirements
-
-Polimetis requires a **RabbitMQ** service runing. You can start it using docker-compose.
+We are going to require the following:
+- RabbitMQ
+- MongoDB
 
 Create a `docker-compose.yml` file and copy the following (do not use this in production):
 
@@ -32,58 +25,101 @@ version: '2'
 services:
   rabbitmq:
     image: 'rabbitmq:3.7-management-alpine'
+    restart: always
     ports:
       - '15672:15672'
       - '5672:5672'
+  mongo:
+    image: 'bitnami/mongodb:latest'
+    restart: always
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGODB_USERNAME=fibonacci
+      - MONGODB_PASSWORD=fibonacci
+      - MONGODB_DATABASE=fibonacci
 ```
 Finally start the service
 ```bash
 $ docker-compose up -d
 ```
 
-# Usage
+# Services
+We are going to create two services:
+- API (server)
+- Fibonacci (worker)
+
+## API service
+
+To access our backend we are going to create a REST API to allow provide the needed endpoints for our client application.
+
+For this we are going to create a service using **polymetis** which provides an easy way to create REST endopints.
+
+```sh
+mkdir api
+cd api
+npm init
+```
+
+Specify the entry point as `index.ts`.
+
+Install all the dependecies for typescript, mongo, lodash(super useful) and **polymetis**
+```sh
+npm i --save-dev @types/dotenv @types/lodash @types/mongoose @types/node ts-node typescript
+npm i --save dotenv lodash mongoose polymetis-node
+```
+
+Create an `.env` file with the configuration of the service
+```sh
+touch .env
+```
+```
+ENVIRONMENT='local'
+SERVICE='api'
+
+# Logger mode
+# ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
+LOGGER_MODE='0'
+
+API_PORT='8000'
+API_BASE_ROUTE='/api'
+
+RABBITMQ_HOST='localhost'
+RABBITMQ_PORT='5672'
+RABBITMQ_USERNAME='guest'
+RABBITMQ_PASSWORD='guest'
+
+MONGO_HOST='localhost'
+MONGO_USERNAME='fibonacci'
+MONGO_PASSWORD='fibonacci'
+MONGO_DATABASE='fibonacci'
+MONGO_PORT='27017'
+```
+
+Next create an `index.ts` file and lets create our first polymetis service
+
+```sh
+touch index.ts
+```
 
 ```typescript
-import { ServiceBase, Configuration } from 'polymetis-node';
-import * as bodyParser from 'body-parser';
-import cors from 'cors';
+import { ServiceBase } from 'polymetis-node';
 
-const configuration: Configuration = {
-  baseDir: __dirname,
-  service: {
-    environment: 'local',
-    service: 'email',
-    loggerMode: '0',
-  },
-  api: {
-    port: 8001,
-  },
-  rabbit: {
-    host: '',
-    port: 5672,
-    username: 'guest',
-    password: 'guest',
-  },
-};
-
-const service = new ServiceBase({ configuration });
+const service = new ServiceBase();
 service.init()
   .then(async () => {
-    await service.initTasks();
-    await service.initEvents();
-    await service.initRPCs();
-
-    service.app.use(bodyParser.json());
-    service.app.use(bodyParser.urlencoded({ extended: false }));
-    service.app.use(cors());
-    await service.initAPI();
-
     service.logger.info('Initialized...');
   })
   .catch((error) => {
     service.logger.error('Exiting:', error);
   });
+```
 
+Start the service
+```sh
+$ ts-node index.ts
+[local::api] [2019-12-06 07:25:58:786] [INFO] Rabbit connection initialized...
+[local::api] [2019-12-06 07:25:58:788] [INFO] Initialized...
 ```
 
 ## ENV configuration
