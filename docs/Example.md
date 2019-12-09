@@ -142,7 +142,7 @@ import {
 import * as _ from 'lodash';
 
 export default class Route extends ApiRoute {
-  public url: string = '/calculate';
+  public url: string = '/fib';
 
   constructor(resources: ServiceResources) {
     super(resources);
@@ -207,7 +207,7 @@ And in our service logs we should have something indicatng that the route ``/api
 
 Nice. Now we should adecuate our endpoint yo receive a parameter via JSON. For this we have to prepare the ExpressJS app polymetis creates fo us in the service.
 
-In the index lets add the following lines:
+In the ``index.ts`` lets add the following lines:
 
 ```typescript
 import { ServiceBase, Configuration } from 'polymetis-node';
@@ -244,7 +244,7 @@ import {
 import * as _ from 'lodash'; // import lodash (super usefull)
 
 export default class Route extends ApiRoute {
-  public url: string = '/calculate';
+  public url: string = '/fib';
 
   constructor(resources: ServiceResources) {
     super(resources);
