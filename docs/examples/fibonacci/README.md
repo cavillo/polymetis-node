@@ -1,6 +1,18 @@
 # Fibonacci Example
 
-The most over complicated and inefficient fibonacci calculator of all time.
+In this example we will develop a very unrealistic and a little overcomplicated `fibonacci calculator`. But it will help understand the basic concepts of ``polymetis`` and how can we build loosely coupled and event-driven microservices with no pain.
+
+The system consists of a web client (react) that will show an input where a user can ask for the Fibonacci value of any integer. The client will also list all the fibonacci values previously calculated.
+
+In the backend, we will have a microservice event-driven architecture that will consist of two main services. First we will create an API service that will allow the communication with the client. Second, we will create a worker service that will be responsible for calculating and storing the fibonacci calculations. The idea is to abstract all the heavy work to a service we can later scale (or auto scale) depending only on his own workload.
+
+The API service will receive the request for the Fibonacci value of a specific number, and it will emit an asynchronous event ``fib.requested`` returning nothing but a confirmation that the request was successfully received.
+
+The worker node, will handle the ``fib.requested`` events and will perform the calculations storing them in a Mongo database.
+
+To get the results the client will consume a GET endpoint wich will return all the calculated values. For this, the API service will do a RPC to the Fibonacci service in order to get the already calculated values.
+
+This example is not intended to do the Ultimate Fibonacci Calculator, but to show the use of the most important features of ``polymetis-node``.
 
 ![](./fib-example-general.png)
 
