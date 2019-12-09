@@ -1,8 +1,17 @@
-import { ServiceBase } from 'polymetis-node';
+import { ServiceBase, Configuration } from 'polymetis-node';
+import express from 'express';
 
-const service = new ServiceBase();
+// Initializing service
+const configuration: Configuration = {
+  baseDir: __dirname,
+};
+const service = new ServiceBase({ configuration });
 service.init()
   .then(async () => {
+    service.app.use(express.json()); // for parsing application/json
+    service.app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+    service.initAPI();
     service.logger.info('Initialized...');
   })
   .catch((error) => {
