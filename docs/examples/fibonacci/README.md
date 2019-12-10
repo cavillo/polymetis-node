@@ -21,7 +21,7 @@ To get the results the client will consume a GET endpoint wich will return all t
 
 This example is not intended to do the Ultimate Fibonacci Calculator, but to show the use of the most important features of ``polymetis-node``.
 
-![](./fib-example-general.png)
+![](./fib-general.png)
 
 ## Getting started
 Create a directory for our project and lets install typescript
