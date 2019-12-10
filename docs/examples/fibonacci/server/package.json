@@ -1,9 +1,10 @@
 {
-  "name": "fibonacci",
+  "name": "fibonacci-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "The most over complicated and inefficient fibonacci calculator of all time.",
   "main": "index.ts",
   "scripts": {
+    "start": "ts-node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -19,7 +20,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
-    "mongoose": "^5.7.14",
+    "mongoose": "^5.7.13",
     "polymetis-node": "^1.2.6"
   }
 }

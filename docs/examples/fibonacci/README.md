@@ -1,28 +1,35 @@
 # Fibonacci Example
 
+## Topics
+
+- Simple Event-Driven Design
+- Scalable Worker service
+- Server service
+- Use of light RPC's
+
 In this example we will develop a very unrealistic and a little overcomplicated `fibonacci calculator`. But it will help understand the basic concepts of ``polymetis`` and how can we build loosely coupled and event-driven microservices with no pain.
 
 The system consists of a web client (react) that will show an input where a user can ask for the Fibonacci value of any integer. The client will also list all the fibonacci values previously calculated.
 
-In the backend, we will have a microservice event-driven architecture that will consist of two main services. First we will create an API service that will allow the communication with the client. Second, we will create a worker service that will be responsible for calculating and storing the fibonacci calculations. The idea is to abstract all the heavy work to a service we can later scale (or auto scale) depending only on his own workload.
+In the backend, we will have a microservice event-driven architecture that will consist of two main services. First we will create an Service service that will allow the communication with the client. Second, we will create a worker service that will be responsible for calculating and storing the fibonacci calculations. The idea is to abstract all the heavy work to a service we can later scale (or auto scale) depending only on his own workload.
 
-The API service will receive the request for the Fibonacci value of a specific number, and it will emit an asynchronous event ``fib.requested`` returning nothing but a confirmation that the request was successfully received.
+The Service service will receive the request for the Fibonacci value of a specific number, and it will emit an asynchronous event ``fib.requested`` returning nothing but a confirmation that the request was successfully received.
 
 The worker node, will handle the ``fib.requested`` events and will perform the calculations storing them in a Mongo database.
 
-To get the results the client will consume a GET endpoint wich will return all the calculated values. For this, the API service will do a RPC to the Fibonacci service in order to get the already calculated values.
+To get the results the client will consume a GET endpoint wich will return all the calculated values. For this, the Service service will do a RPC to the Fibonacci service in order to get the already calculated values.
 
 This example is not intended to do the Ultimate Fibonacci Calculator, but to show the use of the most important features of ``polymetis-node``.
 
 ![](./fib-example-general.png)
 
-## Topics
-
-- Simple Event-Driven Design
-- Scalable Fibonacci service
-- API service
-- Use of light RPC's
-
+## Getting started
+Create a directory for our project and lets install typescript
+```sh
+mkdir fibonacci
+cd fibonacci
+npm i -g ts-node typescript
+```
 
 ## Infrastructure
 
@@ -56,20 +63,20 @@ Finally start the service
 $ docker-compose up -d
 ```
 
-# Services
+# Backend
 We are going to create two services:
-- API (server)
-- Fibonacci (worker)
+- Server (api)
+- Worker (fib calculator)
 
-## API service
+## Server service
 
 To access our backend we are going to create a REST API to allow provide the needed endpoints for our client application.
 
 For this we are going to create a service using **polymetis** which provides an easy way to create REST endopints.
 
 ```sh
-mkdir api
-cd api
+mkdir server
+cd server
 npm init
 ```
 
@@ -77,7 +84,6 @@ Specify the entry point as `index.ts`.
 
 Install all the dependecies for typescript, lodash(super useful) and **polymetis**
 ```sh
-npm i -g ts-node typescript
 npm i --save-dev @types/dotenv @types/lodash @types/node ts-node typescript
 npm i --save dotenv lodash polymetis-node
 ```
@@ -88,14 +94,13 @@ touch .env
 ```
 ```
 ENVIRONMENT='local'
-SERVICE='api'
+SERVICE='server'
 
 # Logger mode
 # ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
 LOGGER_MODE='0'
 
 API_PORT='8000'
-API_BASE_ROUTE='/api'
 
 RABBITMQ_HOST='localhost'
 RABBITMQ_PORT='5672'
@@ -125,17 +130,17 @@ service.init()
 Start the service
 ```sh
 $ ts-node index.ts
-[local::api] [...] [INFO] Rabbit connection initialized...
-[local::api] [...] [INFO] Initialized...
+[local::server] [...] [INFO] Rabbit connection initialized...
+[local::server] [...] [INFO] Initialized...
 ```
 
-Now we have the API service going lets define the endpoint we need for our app:
-  - calculate: [POST] calculates the value fibonacci of a number.
-  - get-all: [GET] return all calculated fibonacci numbers.
+Now we have the Server going lets define the endpoints we need for our app:
+  - calculate: `POST /fib/calculate` calculates the value fibonacci of a number.
+  - get-all: `GET /fib` return all calculated fibonacci numbers.
 
-### REST Endpoints
+**REST Endpoints**
 
-To create endpoints we needs to create  `route.ts` files prefixed with [`get`, `post`, `put`, `delete`] inside an `api` directory.
+To create endpoints we needs to create `route.ts` files prefixed with [`get`, `post`, `put`, `delete`] inside an `api` directory.
 
 So lets crate an `api` directory
 ```bash
@@ -154,7 +159,7 @@ import {
 import * as _ from 'lodash';
 
 export default class Route extends ApiRoute {
-  public url: string = '/fib';
+  public url: string = '/fib/calculate';
 
   constructor(resources: ServiceResources) {
     super(resources);
@@ -167,7 +172,7 @@ export default class Route extends ApiRoute {
 }
 ```
 
-Once we start creating endoints in the ``api`` folder we have to explicily tell our service we want to initialize the `API routes`. This we do on the ``index.ts` by adding the following lines:
+Once we start creating endoints in the ``api`` folder we have to explicily tell the service we want to initialize the `API routes`. This we do on the ``index.ts` by adding the following lines:
 
 ```typescript
 import { ServiceBase } from 'polymetis-node';
@@ -175,7 +180,7 @@ import { ServiceBase } from 'polymetis-node';
 const service = new ServiceBase();
 service.init()
   .then(async () => {
-    service.initAPI(); // Add to initialize API endpoints
+    await service.initAPI(); // Add to initialize API endpoints
     service.logger.info('Initialized...');
   })
   .catch((error) => {
@@ -186,17 +191,17 @@ service.init()
 Restart the service
 ```sh
 $ ts-node index.ts
-[local::api] [...] [INFO] Rabbit connection initialized...
-[local::api] [...] [INFO] Loading API routes
-[local::api] [...] [INFO] - POST /api/calculate
-[local::api] [...] [INFO] Initialized...
-[local::api] [...] [INFO] API initialized on port 8000
+[local::server] [...] [INFO] Rabbit connection initialized...
+[local::server] [...] [INFO] Loading API routes
+[local::server] [...] [INFO] - POST /fib/calculate
+[local::server] [...] [INFO] API initialized on port 8000
+[local::server] [...] [INFO] Initialized...
 ```
 
 We can try our endpoint by doing a POST call to our API:
 
 ```sh
-curl -i -X POST -d {} 'http://localhost:8000/api/calculate'
+curl -i -X POST -d {} 'http://localhost:8000/fib/calculate'
 
 HTTP/1.1 200 OK
 X-Powered-By: Express
@@ -210,14 +215,14 @@ Connection: keep-alive
 OK
 ```
 
-And in our service logs we should have something indicatng that the route ``/api/calculate`` was accesed via POST and returned a 200 response.
+And in the service logs we should have something indicatng that the route `fib/calculate` was accesed via POST and returned a 200 response.
 
 ```sh
-[local::api] [...] [INFO] POST /api/calculate
-[local::api] [...] [INFO] POST /api/calculate 200
+[local::server] [...] [INFO] POST /fib/calculate
+[local::server] [...] [INFO] POST /fib/calculate 200
 ```
 
-Nice. Now we should adecuate our endpoint yo receive a parameter via JSON. For this we have to prepare the ExpressJS app polymetis creates fo us in the service.
+Now lets prepare the endpoint yo receive a parameter via JSON. For this we have to prepare the ExpressJS app polymetis creates fo us in the service.
 
 In the ``index.ts`` lets add the following lines:
 
@@ -256,7 +261,7 @@ import {
 import * as _ from 'lodash'; // import lodash (super usefull)
 
 export default class Route extends ApiRoute {
-  public url: string = '/fib';
+  public url: string = '/fib/calculate';
 
   constructor(resources: ServiceResources) {
     super(resources);
@@ -277,14 +282,14 @@ export default class Route extends ApiRoute {
 }
 ```
 
-Lets try the endpoint sending the number ``3`` in the POST body
+Lets try the endpoint sending the number `3` in the POST body
 
 ```sh
 curl -i -X POST \
   -H "Content-Type:application/json" \
   -d \
   '{ "number": 3 }' \
-  'http://localhost:8000/api/calculate'
+  'http://localhost:8000/fib/calculate'
 
 HTTP/1.1 200 OK
 X-Powered-By: Express
@@ -305,7 +310,7 @@ curl -i -X POST \
   -H "Content-Type:application/json" \
   -d \
   '{ "number": "three" }' \
-  'http://localhost:8000/api/calculate'
+  'http://localhost:8000/fib/calculate'
 
 HTTP/1.1 400 Bad Request
 X-Powered-By: Express
@@ -319,15 +324,49 @@ Connection: keep-alive
 Invalid number
 ```
 
-Nice! We have now our first endpoint of the API service. Now we need to create the worker service Fibonacci, that will take car of the ahrd work.
+Nice! We have now the first endpoint of the Service service. Lets create the ``GET /fib/`` endpoint to retrive all calculated fibonacci numbers.
+
+So lets crate the new route `get.all.route.ts` inside the `api` folder
+```bash
+touch get.all.route.ts
+```
+
+```typescript
+import {
+  Request,
+  Response,
+  ApiRoute,
+  ServiceResources,
+} from 'polymetis-node';
+import * as _ from 'lodash';
+
+export default class Route extends ApiRoute {
+  public url: string = '/';
+
+  constructor(resources: ServiceResources) {
+    super(resources);
+  }
+
+  public async callback(req: Request, res: Response): Promise<any> {
+    // Here goes our logic
+    this.resources.logger.debug('Getting all calculated fibonacci numbers');
+    // Here goes our logic
+
+    res.send([]);
+  }
+}
+```
+
+
+Now we need to create the worker service Fibonacci, that will take car of the ahrd work.
 
 ## Fibonacci service
 
 To create the worker service lets repeat the steps for creating a service with polymetis.
-In the root directory of the example, lets create a new folder `fibonacci` for the new service next to the api service.
+In the root directory of the example, lets create a new folder `worker` for the new service next to the api service.
 ```sh
-mkdir fibonacci
-cd fibonacci
+mkdir worker
+cd worker
 npm init
 ```
 
@@ -345,7 +384,7 @@ touch .env
 ```
 ```
 ENVIRONMENT='local'
-SERVICE='fibonacci'
+SERVICE='worker'
 
 # Logger mode
 # ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
@@ -363,16 +402,20 @@ MONGO_DATABASE='fibonacci'
 MONGO_PORT='27017'
 ```
 
-Next create an `index.ts` file and lets create our first polymetis service
+Next create an `index.ts` file and lets create the worker service
 
 ```sh
 touch index.ts
 ```
 
 ```typescript
-import { ServiceBase } from 'polymetis-node';
+import { ServiceBase, Configuration } from 'polymetis-node';
 
-const service = new ServiceBase();
+// Initializing service
+const configuration: Configuration = {
+  baseDir: __dirname,
+};
+const service = new ServiceBase({ configuration });
 service.init()
   .then(async () => {
     service.logger.info('Initialized...');
@@ -385,10 +428,145 @@ service.init()
 Start the service
 ```sh
 $ ts-node index.ts
-[local::fibonacci] [...] [INFO] Rabbit connection initialized...
-[local::fibonacci] [...] [INFO] Initialized...
+[local::worker] [...] [INFO] Rabbit connection initialized...
+[local::worker] [...] [INFO] Initialized...
 ```
 
-Nice! Now we have two services running. You can open tow consoles and run each service in each console.
+Nice! Now we have two services running. You can open two consoles and run each service in each console.
 
-![](./console-api-fibonacci.png)
+## RPC's
+
+Polymetis provides a very easy way to declare synchronus remote procedures that can be call between services. We will need to define a couple procedures in the `Worker` that the `Server` is going to call.
+- fib-get-one(number)
+- fib-get-all()
+
+All RPC definitions have to be inside a folder named `rpc` and files must have the extension `rpc.ts` in the defined index of the service. So lets create the following directory `worker/rpc`
+```bash
+mkdir rpc
+cd rpc
+touch get-one.rpc.ts
+touch get-all.rpc.ts
+```
+
+```typescript
+// get-one.rpc.ts
+import * as _ from 'lodash';
+import { ServiceResources, RPCHandlerBase } from 'polymetis-node';
+
+export default class Handler extends RPCHandlerBase {
+  // Name of the procedure that will be use to call it from other services
+  public topic = 'fib-get-one';
+
+  constructor(resources: ServiceResources) {
+    super(resources);
+  }
+
+  // RPC main functions
+  // here it will return a number if it is in the database
+  // or null if it isnt calculated yet
+  protected async handleCallback(data: any): Promise<number | null> {
+    this.resources.logger.debug('Executing fib-get-one RPC', data);
+
+    return null;
+  }
+}
+```
+
+```typescript
+// get-all.rpc.ts
+import * as _ from 'lodash';
+import { ServiceResources, RPCHandlerBase } from 'polymetis-node';
+
+export default class Handler extends RPCHandlerBase {
+  // Name of the procedure that will be use to call it from other services
+  public topic = 'fib-get-all';
+
+  constructor(resources: ServiceResources) {
+    super(resources);
+  }
+
+  // RPC main functions
+  // here it will return all numbers calculated in the database
+  protected async handleCallback(data: any): Promise<any[]> {
+    this.resources.logger.debug('Executing fib-get-one RPC', data);
+
+    return [];
+  }
+}
+```
+
+In the ``index.ts`` lets add the following lines:
+
+```typescript
+import { ServiceBase, Configuration } from 'polymetis-node';
+
+// Initializing service
+const configuration: Configuration = {
+  baseDir: __dirname,
+};
+const service = new ServiceBase({ configuration });
+service.init()
+  .then(async () => {
+    await service.initRPCs(); // Add this to initialize the RPC's
+    service.logger.info('Initialized...');
+  })
+  .catch((error) => {
+    service.logger.error('Exiting:', error);
+  });
+```
+
+Restart the service
+```sh
+$ ts-node index.ts
+[local::worker] [...] [INFO] Rabbit connection initialized...
+[local::worker] [...] [INFO] Loading RPCs
+[local::worker] [...] [INFO] - fib-get-all
+[local::worker] [...] [INFO] - fib-get-one
+[local::worker] [...] [INFO] RPCs initialized
+[local::worker] [...] [INFO] Initialized...
+```
+
+### Calling the procedure
+
+Now we defined the RPC's is time to actually call them from the server.
+
+In the endoint `GET /fib` we need to call the `fib-get-all` procedure that we just defined. In the `server/api/get.all.route.ts` file lets add the following:
+
+```typescript
+import {
+  Request,
+  Response,
+  ApiRoute,
+  ServiceResources,
+} from 'polymetis-node';
+import * as _ from 'lodash';
+
+export default class Route extends ApiRoute {
+  public url: string = '/fib';
+
+  constructor(resources: ServiceResources) {
+    super(resources);
+  }
+
+  public async callback(req: Request, res: Response): Promise<any> {
+    // Calling rpc fib-get-all in service worker
+    // this.callRPC method comes with the ApiRoute class from polymetis
+    // It receives as the first argument the name of the service where the RCP is defiend.
+    // It receives as the second argument the name of the RCP topic defined.
+    // It receives as the third argument the payload that the procedure will receive.
+    // The async call returns a status and an error or the response data we receive from the procedure.
+    const { status, data, error } = await this.callRPC('worker', 'fib-get-all', {});
+    if (status === 'error') {
+      this.resources.logger.error(error);
+      return res.status(400).send(error);
+    }
+    if (status === 'timeout') {
+      this.resources.logger.error(error);
+      return res.status(500).send('timeout');
+    }
+    const retval: [] = data;
+
+    res.send(retval);
+  }
+}
+```

@@ -7,7 +7,7 @@ import {
 import * as _ from 'lodash';
 
 export default class Route extends ApiRoute {
-  public url: string = '/calculate';
+  public url: string = '/fib/calculate';
 
   constructor(resources: ServiceResources) {
     super(resources);

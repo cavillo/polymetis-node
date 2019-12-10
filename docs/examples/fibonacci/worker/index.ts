@@ -1,5 +1,4 @@
 import { ServiceBase, Configuration } from 'polymetis-node';
-import express from 'express';
 
 // Initializing service
 const configuration: Configuration = {
@@ -8,10 +7,7 @@ const configuration: Configuration = {
 const service = new ServiceBase({ configuration });
 service.init()
   .then(async () => {
-    service.app.use(express.json()); // for parsing application/json
-    service.app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-
-    service.initAPI();
+    await service.initRPCs();
     service.logger.info('Initialized...');
   })
   .catch((error) => {
