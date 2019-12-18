@@ -564,7 +564,7 @@ export default class Route extends ApiRoute {
       this.resources.logger.error(error);
       return res.status(500).send('timeout');
     }
-    const retval: [] = data;
+    const retval: any[] = data;
 
     res.send(retval);
   }

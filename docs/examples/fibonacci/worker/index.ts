@@ -8,6 +8,8 @@ const service = new ServiceBase({ configuration });
 service.init()
   .then(async () => {
     await service.initRPCs();
+    await service.initEvents();
+    await service.initTasks();
     service.logger.info('Initialized...');
   })
   .catch((error) => {
