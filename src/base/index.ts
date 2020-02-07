@@ -26,7 +26,10 @@ const loadEvents = async (resources: ServiceResources, events: any = {}, dir?: s
 
   for (const handlerName of handlers) {
     const handlerPath = path.join(eventsDir, handlerName);
-    if (_.endsWith(handlerName, '.event.ts')) {
+    if (
+          _.endsWith(handlerName, '.event.ts') // TyspeScript
+      ||  _.endsWith(handlerName, '.event.js') // JavaScript
+    ) {
       try {
         const handlerSpec = require(handlerPath).default;
         const handler: HandlerBase = new handlerSpec(resources);
@@ -71,7 +74,10 @@ const loadTasks = async (resources: ServiceResources, tasks: any = {}, dir?: str
   for (const handlerName of handlers) {
     const handlerPath = path.join(tasksDir, handlerName);
 
-    if (_.endsWith(handlerName, '.task.ts')) {
+    if (
+          _.endsWith(handlerName, '.task.ts') // TyspeScript
+      ||  _.endsWith(handlerName, '.task.js') // JavaScript
+    ) {
       try {
         const handlerSpec = require(handlerPath).default;
         const handler: HandlerBase = new handlerSpec(resources);
@@ -116,7 +122,10 @@ const loadRPC = async (resources: ServiceResources, rpcs: any = {}, dir?: string
   for (const handlerName of handlers) {
     const handlerPath = path.join(rpcsDir, handlerName);
 
-    if (_.endsWith(handlerName, '.rpc.ts')) {
+    if (
+          _.endsWith(handlerName, '.rpc.ts') // TyspeScript
+      ||  _.endsWith(handlerName, '.rpc.js') // JavaScript
+    ) {
       try {
         const handlerSpec = require(handlerPath).default;
         const handler: HandlerBase = new handlerSpec(resources);

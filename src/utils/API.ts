@@ -37,7 +37,10 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
     const handlerPath = path.join(routesDir, handlerName);
     const method = _.toLower(handlerName.split('.')[0]);
 
-    if (_.endsWith(handlerName, '.route.ts')) {
+    if (
+          _.endsWith(handlerName, '.route.ts') // TyspeScript
+      ||  _.endsWith(handlerName, '.route.js') // JavaScript
+    ) {
       // skip non route ts files
       // all routes should end in route.ts
       // all routes should start with the HTTP method to implement followed by a dot
