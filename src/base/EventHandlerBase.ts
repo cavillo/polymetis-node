@@ -23,12 +23,4 @@ export default abstract class EventHandlerBase extends HandlerBase{
   }
 
   protected abstract async handleCallback(data: any): Promise<void>;
-
-  protected async emitTask(task: string, data: any) {
-    const topic = `${this.resources.configuration.service.service}.${task}`;
-    this.resources.rabbit.emit(
-      topic,
-      data,
-    );
-  }
 }
