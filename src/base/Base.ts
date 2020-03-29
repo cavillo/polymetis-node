@@ -13,6 +13,14 @@ export default class Base {
     );
   }
 
+  protected async emitTask(task: string, data: any) {
+    const topic = `${this.resources.configuration.service.service}.${task}`;
+    this.resources.rabbit.emit(
+      topic,
+      data,
+    );
+  }
+
   public async callRPC(service: string, procedure: string, data: any): Promise<RPCResponsePayload> {
     const { environment } = this.resources.configuration.service;
     const topic = `${environment}.${service}.rpc.${procedure}`;

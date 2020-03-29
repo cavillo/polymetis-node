@@ -1,7 +1,7 @@
 {
   "name": "polymetis-node",
-  "version": "1.3.0",
-  "description": "Wrapper for building micro-services. Polymetis provides a connection to a rabbit message broker for handling events, tasks & RPC's.",
+  "version": "1.3.1",
+  "description": "Framework for building distributed microservices systems. Out of the box REST API, event, tasks and RPC' handlers.",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
@@ -41,8 +41,8 @@
     "@types/mocha": "5.2.6",
     "@types/node": "^10.14.13",
     "chai": "^4.2.0",
-    "mocha": "^6.2.0",
-    "ts-node": "^7.0.1",
+    "mocha": "^6.2.3",
+    "ts-node": "^8.8.1",
     "tslint": "5.11.0",
     "tslint-config-airbnb": "5.11.0",
     "typescript": "^3.1.6"
@@ -53,7 +53,7 @@
     "chalk": "^2.4.1",
     "cors": "^2.8.5",
     "crypto-js": "^3.1.9-1",
-    "dockerode": "^2.5.8",
+    "dockerode": "^3.1.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "glob": "^7.1.3",
