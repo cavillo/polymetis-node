@@ -15,7 +15,7 @@ steps:
   - name: slack-build-start
     image: plugins/slack
     settings:
-      webhook: https://hooks.slack.com/services/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
+      webhook: https://hooks.slack.com/services/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
       channel: polymetis-node
       template: >
           {{build.event}} to `{{ lowercase build.branch }}` by *{{ build.author }}* -> {{ build.link }}
@@ -57,8 +57,8 @@ steps:
   - name: slack-build-finished
     image: plugins/slack
     settings:
-      webhook: https://hooks.slack.com/services/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
-      channel: dployer
+      webhook: https://hooks.slack.com/services/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
+      channel: polymetis-node
       template: >
         {{#success build.status}}
           {{build.event}} to `{{ lowercase build.branch }}` succeeded. Good job *{{ build.author }}*.
