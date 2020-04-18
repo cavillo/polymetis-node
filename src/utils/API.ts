@@ -3,27 +3,17 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import ApiRoute from '../base/RouteHandlerBase';
-import { ServiceResources } from '../';
-export {
-  express,
-  Express,
-  NextFunction,
-  Request,
-  Response,
-  ApiRoute,
-  loadRoutes,
-  logApiRoute,
-};
+import { RouteHandlerBase } from '../base';
+import ServiceBase, { ServiceResources } from '../ServiceBase';
 
-const loadRoutes = async (app: Express, resources: ServiceResources, routes: any = {}, dir?: string) => {
-  const apiBaseRoute = _.isEmpty(resources.configuration.api.baseRoute) ? '' : resources.configuration.api.baseRoute;
-  const trustedEndpoints = ['get', 'delete', 'put', 'post'];
+type TrustedEndpoints = 'get' | 'delete' | 'put' | 'post';
+
+const loadRoutes = async (service: ServiceBase, dir?: string) => {
   let routesDir: string;
   if (dir) {
     routesDir = dir;
   } else {
-    routesDir = path.join(resources.configuration.baseDir, './api/');
+    routesDir = path.join(service.resources.configuration.baseDir, './api/');
   }
 
   let handlers: string[];
@@ -48,40 +38,25 @@ const loadRoutes = async (app: Express, resources: ServiceResources, routes: any
       // eg: post.route.ts
       // eg: get.allByBusiness.route.ts
       if (
-        !_.includes(trustedEndpoints, method)
+           method !== 'get'
+        && method !== 'post'
+        && method !== 'put'
+        && method !== 'delete'
       ) {
         continue;
       }
       try {
         const routeClass = require(handlerPath).default;
-        const routeInstance: ApiRoute = new routeClass(resources);
+        const routeInstance: RouteHandlerBase = new routeClass(service.resources);
 
-        const routeURL = `${apiBaseRoute}${routeInstance.url}`;
-
-        switch (method) {
-          case 'get':
-            app.get(routeURL, routeInstance.routeCallback.bind(routeInstance));
-            break;
-          case 'post':
-            app.post(routeURL, routeInstance.routeCallback.bind(routeInstance));
-            break;
-          case 'put':
-            app.put(routeURL, routeInstance.routeCallback.bind(routeInstance));
-            break;
-          case 'delete':
-            app.delete(routeURL, routeInstance.routeCallback.bind(routeInstance));
-            break;
-        }
-
-        routes[routeInstance.url] = routeInstance;
-        resources.logger.info('-', `${_.toUpper(method)}`, routeURL);
+        await service.loadRoute(routeInstance, method);
       } catch (error) {
-        resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
+        service.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
     } else {
       try {
         // recurse down the directory tree
-        await loadRoutes(app, resources, routes, path.join(handlerPath, '/'));
+        await loadRoutes(service, path.join(handlerPath, '/'));
       } catch (error) {
         continue;
       }
@@ -113,4 +88,15 @@ const logApiRoute = (resources: ServiceResources, req: Request, res: Response, n
   res.on('finish', logFinish);
 
   next();
+};
+
+export {
+  express,
+  Express,
+  NextFunction,
+  Request,
+  Response,
+  TrustedEndpoints,
+  loadRoutes,
+  logApiRoute,
 };

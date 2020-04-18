@@ -2,14 +2,16 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
-    "lib": ["es6","dom"],
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "outDir": "dist",
-    "baseUrl" : "src",
-    "rootDir": "src",
+    "baseUrl": "src",
+    "rootDir": ".",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "paths": {
-    },
+    "paths": {},
     "inlineSources": true,
     "inlineSourceMap": true,
     "declaration": true,
@@ -20,8 +22,7 @@
     "test/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "test"
+    "node_modules"
   ],
   "typeRoots": [
     "node_modules/@types"

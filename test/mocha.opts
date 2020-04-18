@@ -1,0 +1,5 @@
+--colors
+--require ts-node/register
+--recursive
+--exit
+--timeout 20000

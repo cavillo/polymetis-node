@@ -14,10 +14,8 @@ export default class ApiRouteImpl extends ApiRoute {
   }
 
   public async callback(req: Request, res: Response): Promise<any> {
-    await this.resources.rabbit.emit('healthz.audited', {});
+    await this.emitTask('check.healthz', {});
 
-    const response = await this.callRPC(this.resources.configuration.service.service, 'check-healthz', {});
-
-    res.status(200).send(_.get(response, 'data', 'Something is not ok'));
+    res.status(200).send('ok');
   }
 }

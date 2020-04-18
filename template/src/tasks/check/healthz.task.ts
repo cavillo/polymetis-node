@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import {
   ServiceResources,
-  TaskHandlerBase
+  TaskHandlerBase,
 } from 'polymetis-node';
 
 export default class Handler extends TaskHandlerBase {
@@ -12,6 +12,13 @@ export default class Handler extends TaskHandlerBase {
   }
 
   protected async handleCallback(data: any): Promise<void> {
-    this.resources.logger.info('=> Check ok');
+    this.resources.logger.info('Healthz checked');
+
+    await this.emitEvent(
+      'healthz.checked',
+      {
+        service: this.resources.configuration.service.service,
+      },
+    );
   }
 }

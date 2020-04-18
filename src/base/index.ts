@@ -7,14 +7,15 @@ import HandlerBase from './HandlerBase';
 import EventHandlerBase from './EventHandlerBase';
 import TaskHandlerBase from './TaskHandlerBase';
 import RPCHandlerBase from './RPCHandlerBase';
-import { ServiceResources } from '../';
+import RouteHandlerBase from './RouteHandlerBase';
+import ServiceBase from '../ServiceBase';
 
-const loadEvents = async (resources: ServiceResources, events: any = {}, dir?: string): Promise<any> => {
+const loadEvents = async (service: ServiceBase, dir?: string): Promise<void> => {
   let eventsDir: string;
   if (dir) {
     eventsDir = dir;
   } else {
-    eventsDir = path.join(resources.configuration.baseDir, './events/');
+    eventsDir = path.join(service.resources.configuration.baseDir, './events/');
   }
 
   let handlers: string[];
@@ -32,36 +33,29 @@ const loadEvents = async (resources: ServiceResources, events: any = {}, dir?: s
     ) {
       try {
         const handlerSpec = require(handlerPath).default;
-        const handler: HandlerBase = new handlerSpec(resources);
+        const handler: EventHandlerBase = new handlerSpec(service.resources);
 
-        if (_.has(events, handler.topic)) {
-          throw new Error(`Duplicated event listener: ${handler.topic}`);
-        }
-
-        await handler.init();
-        events[handler.topic] = handler;
+        await service.loadEvent(handler);
       } catch (error) {
-        resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
+        service.resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
       }
     } else {
       try {
         // recurse down the directory tree
-        await this.loadEvents(resources, events, path.join(handlerPath, '/'));
+        await this.loadEvents(service, path.join(handlerPath, '/'));
       } catch (error) {
-        // resources.logger.error(`Error Rrecursing down ${handlerPath}: ${error}`);
         continue;
       }
     }
   }
-  return events;
 };
 
-const loadTasks = async (resources: ServiceResources, tasks: any = {}, dir?: string): Promise<any> => {
+const loadTasks = async (service: ServiceBase, dir?: string): Promise<void> => {
   let tasksDir: string;
   if (dir) {
     tasksDir = dir;
   } else {
-    tasksDir = path.join(resources.configuration.baseDir, './tasks/');
+    tasksDir = path.join(service.resources.configuration.baseDir, './tasks/');
   }
 
   let handlers: string[];
@@ -80,36 +74,29 @@ const loadTasks = async (resources: ServiceResources, tasks: any = {}, dir?: str
     ) {
       try {
         const handlerSpec = require(handlerPath).default;
-        const handler: HandlerBase = new handlerSpec(resources);
+        const handler: TaskHandlerBase = new handlerSpec(service.resources);
 
-        if (_.has(tasks, handler.topic)) {
-          throw new Error(`Duplicated task listener: ${handler.topic}`);
-        }
-
-        await handler.init();
-        tasks[handler.topic] = handler;
+        await service.loadTask(handler);
       } catch (error) {
-        resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
+        service.resources.logger.error(`Error Registering Task ${handlerName}: ${error}`);
       }
     } else {
       try {
         // recurse down the directory tree
-        await this.loadTasks(resources, tasks, path.join(handlerPath, '/'));
+        await this.loadTasks(service, path.join(handlerPath, '/'));
       } catch (error) {
-        // resources.logger.error(`Error Rrecursing down ${handlerPath}: ${error}`);
         continue;
       }
     }
   }
-  return tasks;
 };
 
-const loadRPC = async (resources: ServiceResources, rpcs: any = {}, dir?: string): Promise<any> => {
+const loadRPC = async (service: ServiceBase, dir?: string): Promise<void> => {
   let rpcsDir: string;
   if (dir) {
     rpcsDir = dir;
   } else {
-    rpcsDir = path.join(resources.configuration.baseDir, './rpc/');
+    rpcsDir = path.join(service.resources.configuration.baseDir, './rpc/');
   }
 
   let handlers: string[];
@@ -128,28 +115,21 @@ const loadRPC = async (resources: ServiceResources, rpcs: any = {}, dir?: string
     ) {
       try {
         const handlerSpec = require(handlerPath).default;
-        const handler: HandlerBase = new handlerSpec(resources);
+        const handler: RPCHandlerBase = new handlerSpec(service.resources);
 
-        if (_.has(rpcs, handler.topic)) {
-          throw new Error(`Duplicated rpc listener: ${handler.topic}`);
-        }
-
-        await handler.init();
-        rpcs[handler.topic] = handler;
+        await service.loadRPC(handler);
       } catch (error) {
-        resources.logger.error(`Error Registering Event ${handlerName}: ${error}`);
+        service.resources.logger.error(`Error Registering RPC ${handlerName}: ${error}`);
       }
     } else {
       try {
         // recurse down the directory tree
-        await this.loadRPC(resources, rpcs, path.join(handlerPath, '/'));
+        await this.loadRPC(service, path.join(handlerPath, '/'));
       } catch (error) {
-        // resources.logger.error(`Error Rrecursing down ${handlerPath}: ${error}`);
         continue;
       }
     }
   }
-  return rpcs;
 };
 
 export {
@@ -158,6 +138,7 @@ export {
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
+  RouteHandlerBase,
   loadEvents,
   loadTasks,
   loadRPC,

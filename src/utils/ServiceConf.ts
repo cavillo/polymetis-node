@@ -17,8 +17,6 @@ export interface RabbitConfiguration {
   port?: number;
   username?: string;
   password?: string;
-  exchange?: string;
-  queue?: string;
 }
 export interface Configuration {
   baseDir?: string;
@@ -41,8 +39,6 @@ export const rabbitConf: RabbitConfiguration = {
   password: _.get(process.env, 'RABBITMQ_PASSWORD'),
   host: _.get(process.env, 'RABBITMQ_HOST'),
   port: _.toNumber(_.get(process.env, 'RABBITMQ_PORT')),
-  exchange: serviceConf.environment,
-  queue: serviceConf.service,
 };
 export const configuration: Configuration = {
   baseDir: __dirname,

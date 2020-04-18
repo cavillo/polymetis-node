@@ -15,10 +15,11 @@ import {
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
+  RouteHandlerBase,
 } from './base';
+import ApiRoute from './base/RouteHandlerBase'; // TODO: remove duplicated renamed interface
 
 import {
-  ApiRoute,
   Express,
   NextFunction,
   Request,
@@ -32,6 +33,8 @@ import ServiceBase, {
 } from './ServiceBase';
 
 export {
+  ApiRoute, // TODO: remove duplicated renamed interface
+  RouteHandlerBase,
   Configuration,
   ServiceResources,
   ServiceBase,
@@ -40,7 +43,6 @@ export {
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
-  ApiRoute,
   Express,
   NextFunction,
   Response,

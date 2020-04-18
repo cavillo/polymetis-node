@@ -9,11 +9,16 @@ import {
   Express,
   loadRoutes,
   logApiRoute,
+  TrustedEndpoints,
 } from './utils/API';
 import {
   loadEvents,
   loadTasks,
   loadRPC,
+  EventHandlerBase,
+  TaskHandlerBase,
+  RPCHandlerBase,
+  RouteHandlerBase,
 } from './base';
 import {
   serviceConf,
@@ -63,7 +68,8 @@ export default class ServiceBase {
     }
     this.configuration = configuration;
     this.logger = new Logger(configuration.service, loggerCallback);
-    const rabbit = new Rabbit(configuration.rabbit, this.logger);
+
+    const rabbit = new Rabbit(configuration, this.logger);
     this.resources = {
       configuration,
       rabbit,
@@ -85,7 +91,7 @@ export default class ServiceBase {
 
   async initTasks() {
     this.resources.logger.info('Loading TASKS');
-    await loadTasks(this.resources, this.tasks);
+    await loadTasks(this);
     if (_.isEmpty(this.tasks)) {
       this.resources.logger.warn('- No tasks loaded...');
     }
@@ -94,7 +100,7 @@ export default class ServiceBase {
 
   async initEvents() {
     this.resources.logger.info('Loading EVENTS');
-    await loadEvents(this.resources, this.events);
+    await loadEvents(this);
     if (_.isEmpty(this.events)) {
       this.resources.logger.warn('- No events loaded...');
     }
@@ -103,25 +109,83 @@ export default class ServiceBase {
 
   async initRPCs() {
     this.resources.logger.info('Loading RPC\'s');
-    await loadRPC(this.resources, this.rpcs);
+    await loadRPC(this);
     if (_.isEmpty(this.rpcs)) {
       this.resources.logger.warn('- No RPC\'s loaded...');
     }
     this.resources.logger.info('RPC\'s initialized');
   }
 
-  async initAPI() {
+  async initAPIRoutes() {
     this.app.use(logApiRoute.bind(this, this.resources));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
 
     this.resources.logger.info('Loading API routes');
-    await loadRoutes(this.app, this.resources, this.routes);
+    await loadRoutes(this);
     if (_.isEmpty(this.routes)) {
       this.resources.logger.warn('- No routes loaded...');
     }
+  }
+
+  async initAPI() {
     await this.app.listen(this.resources.configuration.api.port);
     this.resources.logger.info('API initialized on port', this.resources.configuration.api.port);
+  }
+
+  async loadEvent(handler: EventHandlerBase): Promise<void> {
+    if (_.has(this.events, handler.topic)) {
+      throw new Error(`Duplicated event listener: ${handler.topic}`);
+    }
+
+    await handler.init();
+    this.events[handler.topic] = handler;
+  }
+
+  async loadTask(handler: TaskHandlerBase): Promise<void> {
+    if (_.has(this.tasks, handler.topic)) {
+      throw new Error(`Duplicated task listener: ${handler.topic}`);
+    }
+
+    await handler.init();
+    this.tasks[handler.topic] = handler;
+  }
+
+  async loadRPC(handler: RPCHandlerBase): Promise<void> {
+    if (_.has(this.rpcs, handler.topic)) {
+      throw new Error(`Duplicated rpcs listener: ${handler.topic}`);
+    }
+
+    await handler.init();
+    this.rpcs[handler.topic] = handler;
+  }
+
+  async loadRoute(handler: RouteHandlerBase, method: TrustedEndpoints): Promise<void> {
+    const routeId = `${method}:${handler.url}`;
+    if (_.has(this.routes, routeId)) {
+      throw new Error(`Duplicated API route listener: ${routeId}`);
+    }
+
+    const apiBaseRoute = _.isEmpty(this.resources.configuration.api.baseRoute) ? '' : this.resources.configuration.api.baseRoute;
+    const routeURL = `${apiBaseRoute}${handler.url}`;
+
+    switch (method) {
+      case 'get':
+        this.app.get(routeURL, handler.routeCallback.bind(handler));
+        break;
+      case 'post':
+        this.app.post(routeURL, handler.routeCallback.bind(handler));
+        break;
+      case 'put':
+        this.app.put(routeURL, handler.routeCallback.bind(handler));
+        break;
+      case 'delete':
+        this.app.delete(routeURL, handler.routeCallback.bind(handler));
+        break;
+    }
+
+    this.routes[`${method}:${handler.url}`] = handler;
+    this.resources.logger.info('-[route]', _.toUpper(method), routeURL);
   }
 }

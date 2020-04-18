@@ -13,7 +13,7 @@ export default class Base {
     );
   }
 
-  protected async emitTask(task: string, data: any) {
+  public async emitTask(task: string, data: any) {
     const topic = `${this.resources.configuration.service.service}.${task}`;
     this.resources.rabbit.emit(
       topic,

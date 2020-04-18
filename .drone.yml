@@ -1,6 +1,16 @@
 kind: pipeline
 name: polymetis-node-ci
 
+services:
+- name: rabbit
+  image: 'rabbitmq:3.7-management-alpine'
+  ports:
+  - 15672
+  - 5672
+  when:
+    event: [ pull_request ]
+    branch: [ dev ]
+
 steps:
   - name: slack-build-start
     image: plugins/slack
@@ -10,18 +20,19 @@ steps:
       template: >
           {{build.event}} to `{{ lowercase build.branch }}` by *{{ build.author }}* -> {{ build.link }}
 
-  - name: lint
-    group: lint
+  - name: lint-test
+    group: lint-test
     image: node:latest
     commands:
     - npm i --silent
     - npm run lint
+    - npm run test
     when:
       event: [ pull_request ]
       branch: master
 
   - name: build
-    group: lint
+    group: build
     image: node:latest
     commands:
     - npm i --silent

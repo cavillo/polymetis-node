@@ -1,5 +1,5 @@
 import amqplib from 'amqplib';
-import { RabbitConfiguration } from '../utils/ServiceConf';
+import { Configuration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
 export interface RPCResponsePayload {
     transactionId: string;
@@ -8,14 +8,14 @@ export interface RPCResponsePayload {
     status: 'ok' | 'error' | 'timeout';
 }
 export default class RabbitService {
-    protected conf: RabbitConfiguration;
+    protected conf: Configuration;
     protected logger: Logger;
     private RPC_TIMEOUT;
     private connection?;
     private channel?;
     private url;
     private exchangeName;
-    constructor(conf: RabbitConfiguration, logger: Logger);
+    constructor(conf: Configuration, logger: Logger);
     isConnected(): boolean;
     init(): Promise<void>;
     getChannel(): Promise<amqplib.Channel>;
