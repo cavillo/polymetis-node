@@ -91,7 +91,7 @@ const loadTasks = async (service: ServiceBase, dir?: string): Promise<void> => {
   }
 };
 
-const loadRPC = async (service: ServiceBase, dir?: string): Promise<void> => {
+const loadRPCs = async (service: ServiceBase, dir?: string): Promise<void> => {
   let rpcsDir: string;
   if (dir) {
     rpcsDir = dir;
@@ -141,5 +141,5 @@ export {
   RouteHandlerBase,
   loadEvents,
   loadTasks,
-  loadRPC,
+  loadRPCs,
 };

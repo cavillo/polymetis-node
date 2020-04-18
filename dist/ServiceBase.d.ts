@@ -28,6 +28,7 @@ export default class ServiceBase {
     initEvents(): Promise<void>;
     initRPCs(): Promise<void>;
     initAPIRoutes(): Promise<void>;
+    startAPI(): Promise<void>;
     initAPI(): Promise<void>;
     loadEvent(handler: EventHandlerBase): Promise<void>;
     loadTask(handler: TaskHandlerBase): Promise<void>;

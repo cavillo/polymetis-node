@@ -11,6 +11,7 @@ service.init()
   .then(async () => {
     await service.initTasks();
     await service.initEvents();
+    await service.initRPCs();
     await service.initAPI();
 
     service.logger.info('Service online on pid', process.pid);

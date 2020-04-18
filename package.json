@@ -1,6 +1,6 @@
 {
   "name": "polymetis-node",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Microservices development framework for NodeJS",
   "main": "dist/index.js",
   "scripts": {
@@ -66,5 +66,5 @@
   "bugs": {
     "url": "https://github.com/cavillo/polymetis-node/issues"
   },
-  "homepage": "https://github.com/cavillo/polymetis-node#readme"
+  "homepage": "https://cavillo.github.io/polymetis-node"
 }

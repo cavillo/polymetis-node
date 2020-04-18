@@ -12,6 +12,8 @@ import {
   Response,
 } from '../dist';
 
+import configuration from './conf/service.conf';
+
 /**
  * The objective of the test is to verify
  * the basic service comunication for Events and Tasks.
@@ -25,7 +27,7 @@ import {
 let service: ServiceBase;
 let tmp: boolean = false;
 
-// healthz api route
+// api route
 class ApiRouteImpl extends RouteHandlerBase {
   public url: string = '/tmp-variable';
 
@@ -62,30 +64,8 @@ const delay = (seconds: number): Promise <void> => {
 
 describe('Start service', () => {
   before(async () => {
-    const configuration: Configuration = {
-      baseDir: __dirname,
-      service: {
-        environment: 'local',
-        service: 'test-service',
-        loggerMode: 0,
-        // ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
-      },
-      api: {
-        port: 8000,
-      },
-      rabbit: {
-        host: 'rabbit', // change to localhost in local env
-        port: 5672,
-        username: 'guest',
-        password: 'guest',
-      },
-    };
     service = new ServiceBase({ configuration });
     await service.init();
-
-    // load route
-    const route = new ApiRouteImpl(service.resources);
-    await service.loadRoute(route, 'put');
 
     // load event
     const event = new EventImpl(service.resources);
@@ -95,8 +75,12 @@ describe('Start service', () => {
     const task = new TaskImpl(service.resources);
     await service.loadTask(task);
 
-    await service.initAPI();
+    await service.initRPCs();
 
+    // load route
+    const route = new ApiRouteImpl(service.resources);
+    await service.loadRoute(route, 'put');
+    await service.startAPI();
   });
 
   it('API, events and task', async () => {

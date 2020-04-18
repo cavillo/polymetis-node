@@ -26,6 +26,8 @@ steps:
     commands:
     - npm i --silent
     - npm run lint
+    - rm -rf test/conf/service.conf.ts
+    - mv test/conf/service.ci.conf.ts test/conf/service.conf.ts
     - npm run test
     when:
       event: [ pull_request ]
