@@ -1,6 +1,6 @@
 {
   "name": "polymetis-node",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Microservices development framework for NodeJS",
   "main": "dist/index.js",
   "scripts": {
