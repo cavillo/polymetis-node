@@ -12,13 +12,13 @@ services:
     branch: [ dev ]
 
 steps:
-  - name: slack-build-start
-    image: plugins/slack
-    settings:
-      webhook: https://hooks.slack.com/services/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
-      channel: polymetis-node
-      template: >
-          {{build.event}} to `{{ lowercase build.branch }}` by *{{ build.author }}* -> {{ build.link }}
+  # - name: slack-build-start
+  #   image: plugins/slack
+  #   settings:
+  #     webhook: https://hooks.slack.com/services/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
+  #     channel: polymetis-node
+  #     template: >
+  #         {{build.event}} to `{{ lowercase build.branch }}` by *{{ build.author }}* -> {{ build.link }}
 
   - name: lint-test
     group: lint-test
@@ -54,17 +54,17 @@ steps:
       event: push
       branch: master
 
-  - name: slack-build-finished
-    image: plugins/slack
-    settings:
-      webhook: https://hooks.slack.com/services/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
-      channel: polymetis-node
-      template: >
-        {{#success build.status}}
-          {{build.event}} to `{{ lowercase build.branch }}` succeeded. Good job *{{ build.author }}*.
-        {{else}}
-          {{build.event}} to `{{ lowercase build.branch }}` failed. Please by *{{ build.author }}* fix me -> {{ build.link }}
-        {{/success}}
-    when:
-      event: [ push, pull_request ]
-      branch: master
+  # - name: slack-build-finished
+  #   image: plugins/slack
+  #   settings:
+  #     webhook: https://hooks.slack.com/services/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
+  #     channel: polymetis-node
+  #     template: >
+  #       {{#success build.status}}
+  #         {{build.event}} to `{{ lowercase build.branch }}` succeeded. Good job *{{ build.author }}*.
+  #       {{else}}
+  #         {{build.event}} to `{{ lowercase build.branch }}` failed. Please by *{{ build.author }}* fix me -> {{ build.link }}
+  #       {{/success}}
+  #   when:
+  #     event: [ push, pull_request ]
+  #     branch: master
