@@ -2,13 +2,16 @@
 
 [![Build Status](http://cloud.drone.io/api/badges/cavillo/polymetis-node/status.svg)](http://cloud.drone.io/cavillo/polymetis-node)
 
-Wrapper for building micro-services. Polymetis provides a connection to a rabbit message broker for handling events, tasks & RPC's.
+Polymetis is a tool that provides a light, scalable and customizable base for developing distributed and loosely coupled microservices.
 
-  - REST API for external or internal http consumption
-  - RabbitMQ for event-task mesaging and Remote Procedure Calls
-
-Polymetis is a boilerplate that provides a solid base for the creation of an ecosystem of isolated microservices. Each service can implements its own functionality and coexists with other services within the same infrastucture.
-Each microservice can create its own http(s) **REST API**, and its own event-task handling of events coming from the **RabitMQ** message broker.
+## Features
+  - Loosely Coupuled
+  - Event Driven
+  - Scalable
+  - REST API
+  - RPC's
+  - Extendable Interfaces
+  - Standardized configuration and logging
 
 # Installation
 
@@ -17,10 +20,17 @@ Install the npm package
 $ npm install polymetis-node --save
 ```
 
-## Infrastructure for services needed docker-compose
+Create a microservice template
+```bash
+$ npx polymetis-node my-service
+$ cd my-service
+$ npm start
+```
 
-In case you dont have the needed infrastructure runing you can do it really easily with docker. The simplest and fastest way is by using docker-compose. (Do not use this in production).
-In your server create a `docker-compose.yml` file and copy the following:
+### Requirements
+RabbitMQ is required to allow the service to send and receive messages.
+In case you dont have a RabbitMQ, you can use docker-compose. (Do not use this in production).
+Create a `docker-compose.yml` file and copy the following:
 
 ```yml
 version: '2'
@@ -36,53 +46,152 @@ Finally start your polymetis-node
 $ docker-compose up --build --detach
 ```
 
-# Usage
+# Getting started
+
+Following the file strcuture defined for ```api```, ```events```, ```tasks``` and ```rpc```.
 
 ```typescript
 import { ServiceBase, Configuration } from 'polymetis-node';
-import * as bodyParser from 'body-parser';
-import cors from 'cors';
 
+// Initializing service
 const configuration: Configuration = {
   baseDir: __dirname,
-  service: {
-    environment: 'local',
-    service: 'email',
-    loggerMode: '0',
-  },
-  api: {
-    port: 8001,
-  },
-  rabbit: {
-    host: '',
-    port: 5672,
-    username: 'guest',
-    password: 'guest',
-  },
 };
 
 const service = new ServiceBase({ configuration });
+
 service.init()
   .then(async () => {
     await service.initTasks();
     await service.initEvents();
     await service.initRPCs();
-
-    service.app.use(bodyParser.json());
-    service.app.use(bodyParser.urlencoded({ extended: false }));
-    service.app.use(cors());
     await service.initAPI();
 
-    service.logger.info('Initialized...');
+    service.logger.info('Service online on pid', process.pid);
   })
-  .catch((error) => {
-    service.logger.error('Exiting:', error);
+  .catch((error: any) => {
+    service.logger.error('Exiting', error);
+  });
+```
+Defining handler clases.
+
+```typescript
+import * as _ from 'lodash';
+import {
+  ServiceBase,
+  Configuration,
+  RouteHandlerBase,
+  EventHandlerBase,
+  TaskHandlerBase,
+  Request,
+  Response,
+} from 'polymetis-node';
+
+// api route
+class ApiRouteImpl extends RouteHandlerBase {
+  public url: string = '/healhz';
+
+  public async callback(req: Request, res: Response): Promise<any> {
+    await this.emitTask('check.healthz', {});
+    res.status(200).send('ok');
+  }
+}
+
+// event
+class EventImpl extends EventHandlerBase {
+  public topic: string = 'healthz.checked';
+
+  protected async handleCallback(data: any): Promise<void> {
+    const { service } = this.data;
+    // do some stuff when a service emit healthz checked
+    // ...
+    this.resources.logger.info('Service healthz checked', service);
+  }
+}
+
+// task
+class TaskImpl extends TaskHandlerBase {
+  public topic: string = 'check.healthz';
+
+  protected async handleCallback(data: any): Promise<void> {
+    // verify is all good
+    // ...
+    await this.emitEvent('healthz.checked', { service: this.resources.configuration.service.service });
+  }
+}
+
+const configuration: Configuration = {
+  baseDir: __dirname,
+  service: {
+    environment: 'local',
+    service: 'test-service',
+    loggerMode: 0,
+    // ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
+  },
+  api: {
+    port: 8000,
+  },
+  rabbit: {
+    host: 'localhost',
+    port: 5672,
+    username: 'guest',
+    password: 'guest',
+  },
+};
+const service: ServiceBase = new ServiceBase({ configuration });
+service.init()
+  .then(async () => {
+    // load events
+    const event = new EventImpl(service.resources);
+    await service.loadEvent(event);
+
+    // load tasks
+    const task = new TaskImpl(service.resources);
+    await service.loadTask(task);
+
+    await service.initRPCs();
+
+    // load routes
+    const route = new ApiRouteImpl(service.resources);
+    await service.loadRoute(route, 'put');
+    await service.startAPI();
+
+    service.logger.info('Service online on pid', process.pid);
+  })
+  .catch((error: any) => {
+    service.logger.error('Exiting', error);
   });
 
 ```
 
-## ENV configuration
-Another way to configure the service is via ```.env``` file. Polymetis will take all the information with the following form:
+## Service configuration
+### Using Object
+
+The service can be configure using an object with the following form:
+
+```typescript
+    const configuration: Configuration = {
+      baseDir: __dirname,
+      service: {
+        environment: 'local',
+        service: 'test-service',
+        loggerMode: 0,
+        // ALL='0', DEBUG='1', INFO='2', WARN='3', ERROR='4', OFF='5'
+      },
+      api: {
+        port: 8000,
+      },
+      rabbit: {
+        host: 'rabbit', // change to localhost in local env
+        port: 5672,
+        username: 'guest',
+        password: 'guest',
+      },
+    };
+    service = new ServiceBase({ configuration });
+```
+### Using .env FIle
+The service can be configure using an ```.env``` file. Polymetis will take all the information with the following form:
 ```bash
 # Service
 ENVIRONMENT='test'
@@ -110,32 +219,17 @@ A directory should be specified to the **configuration.baseDir** to locate the r
 base_dir
 │
 └───api
-│   └───healthz
-│       │   get.route.ts
-│       │   ...
-│   └───users
-│       │   get.route.ts
-│       │   post.route.ts
-│       │   ...
-│   ....
-│
+│   │   [get|post|put|delete].*.route.ts
+│   │   ...
 └───events
-│   └───user
-│       │   created.handler.ts
-│       │   updated.handler.ts
-│       │   ...
-│   ....
+│   │   *.event.ts
+│   │   ...
 └───tasks
-│   └───send
-│       │   welcome.handler.ts
-│       │   reset-password.handler.ts
-│       │   ...
-│   ....
+│   │   *.task.ts
+│   │   ...
 └───rpc
-│   └───send
-│       │   custom.rpc.ts
-│       │   ...
-│   ....
+│   │   *.rpc.ts
+│   │   ...
 ```
 
 ### API
@@ -147,10 +241,9 @@ All endpoints name should follow the following rules
 - endpoints **must define**  ```this.url``` wich wil be the url to be subscribe
 - endpoints **must implement**  ```this.callback(req: Request, res: Response): Promise<any>``` wich wil be the function that will handle the request and produce a response
 All files that follow this rules will be loaded as endpoints when the service starts
+
 ```typescript
-// baseDir/healthz/get.route.ts
-// endpoints must start with the method to implement [ get. | post. | put. | delete. ]
-// endpoints must end with .route.ts
+// baseDir/api/healthz/get.route.ts
 import {
   Request,
   Response,
@@ -171,41 +264,76 @@ export default class ApiRouteImpl extends ApiRoute {
   }
 }
 ```
-### Events and Tasks
-Polymetis tries to implement the **tasks-events** pattern for microservices. For this it relies in RabbitMQ for messaging between services. You can read further in this [article](https://runnable.com/blog/event-driven-microservices-using-rabbitmq)
-- Events are notifications that tell subscribed applications when something has happened. Applications subscribe to certain events and respond by creating tasks for themselves. Events should never modify state directly.
-- Tasks are actions which modify state. The only thing that can create a task for a given application is the application itself. This way, applications cannot directly modify each other‘s states.
 
-Events and Tasks implements a handler class defined to abstract some logic and make the handling more straight forward.
+### Events
+Events are notifications that tell subscribed applications when something has happened. Applications subscribe to certain events and respond by creating tasks for themselves. Events should never modify state directly.
+Events have no application name because they can be subscribed to by multiple applications. They start with the model, and end with a past-tense verb that describes what has happened. An example of an event would be ```user.authorized```.
+
+Events implements a handler class defined to abstract some logic and make the handling more straight forward.
 
 All handlers name should follow the following ruules
-- handlers are defined in the ```baseDir/events``` or ```baseDir/tasks```  directory specified un the service configuration
-- handlers **must end with** ```.handler.ts```
-- handlers **must define** ```this.topic``` to specify the rabbit topic to be subscribed
-- handlers **must implement** ```this.handleCallback``` to handle the event/task
-All files that follow this rules will be loaded as handlers when the service starts
+- events are defined in the ```baseDir/events```  directory specified in the service configuration
+- events **must end with** ```.event.ts```
+- events **must define** ```this.topic``` to specify the topic to be subscribed
+- events **must implement** ```this.handleCallback``` to handle the event/task
+All files that follow this rules will be loaded as handlers when the service initialize the events. ```service.initEvents()```
 
-**Event**
 ```typescript
+// baseDir/events/healthz.checked.task.ts
 import * as _ from 'lodash';
-import { ServiceResources, EventHandlerBase } from 'polymetis-node';
+import {
+  EventHandlerBase,
+  ServiceResources,
+} from 'polymetis-node';
 
 export default class Handler extends EventHandlerBase {
-  public topic = 'audited.healthz';
+  public topic = 'healthz.checked';
 
   constructor(resources: ServiceResources) {
     super(resources);
   }
 
   protected async handleCallback(data: any): Promise<void> {
-    await this.emitTask('check.healthz', data);
+    const service: string | null = _.get(data, 'service', null);
+
+    if (!service) {
+      this.resources.logger.warn(this.topic, 'Wrong payload');
+    }
+
+    if (service === this.resources.configuration.service.service) {
+      // handle own service healthz check
+      // ...
+      return;
+    }
+
+    // handle other service healthz check
+    this.resources.logger.info('healthz check:', service);
+    // ...
+    return;
   }
 }
 ```
-**Task**
+
+### Tasks
+Tasks are actions which modify state. The only thing that can create a task for a given application is the application itself. This way, applications cannot directly modify each other‘s states.
+Tasks start with the model whose state is to be modified by the task, followed by a descriptive present-tense verb. An example of a task would be ```user.authorize```. Based on the convention we know this task is handled by the api service, and it wants to perform an authorize on a user object.
+
+Tasks implements a handler class defined to abstract some logic and make the handling more straight forward.
+
+All handlers name should follow the following ruules
+- tasks are defined in the ```baseDir/tasks```  directory specified in the service configuration
+- tasks **must end with** ```.event.ts```
+- tasks **must define** ```this.topic``` to specify the topic to be subscribed
+- tasks **must implement** ```this.handleCallback``` to handle the event/task
+All files that follow this rules will be loaded as handlers when the service initialize the tasks. ```service.initTasks()```
+
 ```typescript
+// baseDir/tasks/check.healthz.task.ts
 import * as _ from 'lodash';
-import { ServiceResources, TaskHandlerBase } from 'polymetis-node';
+import {
+  ServiceResources,
+  TaskHandlerBase,
+} from 'polymetis-node';
 
 export default class Handler extends TaskHandlerBase {
   public topic = 'check.healthz';
@@ -215,13 +343,17 @@ export default class Handler extends TaskHandlerBase {
   }
 
   protected async handleCallback(data: any): Promise<void> {
-    this.resources.logger.log('Checking healthz...');
-    this.resources.logger.log('=> Check finished...');
+    this.resources.logger.info('Healthz checked');
+
+    await this.emitEvent(
+      'healthz.checked',
+      {
+        service: this.resources.configuration.service.service,
+      },
+    );
   }
 }
 ```
-
-> **Note:** polymetis prefixs task topic's automaticaly with the service name specified in the configuration **configuration.service.service**. In the example (asumming the service name is `email`), the real topic to listen is check.healthz, but polymetis abstract this so every event emits and listens only for its own tasks.
 
 ### RPC
 Polymetis allows to call remote procedures defined and published by the microservices in the ecosystem. Remote procedures are called using RabbitMQ.
@@ -237,27 +369,21 @@ import * as _ from 'lodash';
 import { ServiceResources, RPCHandlerBase } from 'polymetis-node';
 
 export default class Handler extends RPCHandlerBase {
-  public topic = 'fibonacci';
+  public topic = 'check-healthz';
 
   constructor(resources: ServiceResources) {
     super(resources);
   }
 
   protected async handleCallback(data: any): Promise<any> {
-    return this.fibonacci(_.toInteger(_.get(data, 'number', '0')));
-  }
-
-  private fibonacci(n: number): number {
-    if (n === 0 || n === 1) {
-      return n;
-    }
-    return n + this.fibonacci(n - 1);
+    return 'Im ok!';
   }
 }
 ```
 
 RouteHandler, EventsHandler and TasksHandler define the helper method ```callRPC(service: string, procedure: string, data: any)```  that abstract the call to the remote procedure of a specific service in the same environment.
 ```typescript
-    const result = await this.callRPC('math', 'fibonacci', { number });
+    const result = await this.callRPC('my-other-service', 'check-healthz', {});
 ```
-
+# References
+[Event-driven Microservices Using RabbitMQ](https://runnable.com/blog/event-driven-microservices-using-rabbitmq)

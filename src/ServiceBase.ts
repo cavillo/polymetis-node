@@ -14,7 +14,7 @@ import {
 import {
   loadEvents,
   loadTasks,
-  loadRPC,
+  loadRPCs,
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
@@ -90,7 +90,6 @@ export default class ServiceBase {
   }
 
   async initTasks() {
-    this.resources.logger.info('Loading TASKS');
     await loadTasks(this);
     if (_.isEmpty(this.tasks)) {
       this.resources.logger.warn('- No tasks loaded...');
@@ -99,7 +98,6 @@ export default class ServiceBase {
   }
 
   async initEvents() {
-    this.resources.logger.info('Loading EVENTS');
     await loadEvents(this);
     if (_.isEmpty(this.events)) {
       this.resources.logger.warn('- No events loaded...');
@@ -108,8 +106,7 @@ export default class ServiceBase {
   }
 
   async initRPCs() {
-    this.resources.logger.info('Loading RPC\'s');
-    await loadRPC(this);
+    await loadRPCs(this);
     if (_.isEmpty(this.rpcs)) {
       this.resources.logger.warn('- No RPC\'s loaded...');
     }
@@ -122,16 +119,20 @@ export default class ServiceBase {
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
 
-    this.resources.logger.info('Loading API routes');
     await loadRoutes(this);
     if (_.isEmpty(this.routes)) {
       this.resources.logger.warn('- No routes loaded...');
     }
   }
 
-  async initAPI() {
+  async startAPI() {
     await this.app.listen(this.resources.configuration.api.port);
-    this.resources.logger.info('API initialized on port', this.resources.configuration.api.port);
+    this.resources.logger.info('API started on port', this.resources.configuration.api.port);
+  }
+
+  async initAPI() {
+    await this.initAPIRoutes();
+    await this.startAPI();
   }
 
   async loadEvent(handler: EventHandlerBase): Promise<void> {
