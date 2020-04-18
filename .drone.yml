@@ -9,7 +9,7 @@ services:
   - 5672
   when:
     event: [ pull_request ]
-    branch: [ dev ]
+    branch: [ master ]
 
 steps:
   # - name: slack-build-start
