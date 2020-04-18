@@ -12,8 +12,6 @@ export interface RabbitConfiguration {
     port?: number;
     username?: string;
     password?: string;
-    exchange?: string;
-    queue?: string;
 }
 export interface Configuration {
     baseDir?: string;

@@ -1,6 +1,6 @@
 import amqplib from 'amqplib';
 import * as _ from 'lodash';
-import { RabbitConfiguration } from '../utils/ServiceConf';
+import { Configuration } from '../utils/ServiceConf';
 import Logger from '../utils/Logger';
 import { clearTimeout } from 'timers';
 
@@ -18,13 +18,13 @@ export default class RabbitService {
   private url: string;
   private exchangeName: string;
 
-  constructor(protected conf: RabbitConfiguration, protected logger: Logger) {
-    const username = conf.username;
-    const password = conf.password;
-    const host = conf.host;
-    const port = conf.port;
+  constructor(protected conf: Configuration, protected logger: Logger) {
+    const username = conf.rabbit.username;
+    const password = conf.rabbit.password;
+    const host = conf.rabbit.host;
+    const port = conf.rabbit.port;
 
-    this.exchangeName = conf.exchange;
+    this.exchangeName = conf.service.environment;
     this.url = `amqp://${username}:${password}@${host}:${port}`;
   }
 
@@ -35,12 +35,12 @@ export default class RabbitService {
   public async init() {
     if (
          !this.conf
-      || !this.conf.host
-      || !this.conf.port
-      || !this.conf.username
-      || !this.conf.password
-      || !this.conf.exchange
-      || !this.conf.queue
+      || !this.conf.rabbit.host
+      || !this.conf.rabbit.port
+      || !this.conf.rabbit.username
+      || !this.conf.rabbit.password
+      || !this.conf.service.environment
+      || !this.conf.service.service
     ) {
       this.logger.warn('RabbitMQ: No parameters for initialization. Skiping...');
       return;

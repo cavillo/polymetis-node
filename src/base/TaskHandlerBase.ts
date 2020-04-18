@@ -13,13 +13,17 @@ export default abstract class TaskHandlerBase extends HandlerBase{
       this.callback.bind(this),          // callback
       queue,                             // queue
     );
-    this.resources.logger.info('-', this.getName());
+    this.resources.logger.info('-[task ]', this.getName());
   }
 
   protected async callback(payload: any) {
-    this.resources.logger.info('Handling task', this.topic);
-    const data = _.get(payload, 'content', {});
-    await this.handleCallback(data);
+    try {
+      this.resources.logger.info('Handling task', this.topic);
+      const data = _.get(payload, 'content', {});
+      await this.handleCallback(data);
+    } catch (error) {
+      this.resources.logger.error('Task handler ERROR', this.topic, JSON.stringify(error));
+    }
   }
 
   protected abstract async handleCallback(data: any): Promise<void>;
