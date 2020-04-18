@@ -92,8 +92,7 @@ const installPackages = () => {
 const printHelp = (SERVICE_NAME) => {
   log(`\tcd ${SERVICE_NAME}`);
   log('');
-  log('\tnpm run start       start service');
-  log('\tnpm run start-dev   start service with nodemon');
+  log('\tnpm start           start service');
   log('\tnpm run lint        lint');
   log('\tnpm run test        run tests');
   log('\tnpm run build       build');
@@ -109,11 +108,12 @@ const createService = () => {
     log('Setting up service');
     setupServiceProject();
 
-    // installing dependendies
-    log('Installing dependendies');
+    // installing dependencies
+    log('Installing dependencies');
     installPackages();
 
-    log(`Service [${SERVICE_NAME}] created succesfully! ✅\nHappy ts coding! 💪\n`);
+    log(`Service [${SERVICE_NAME}] created succesfully!`);
+    log(`Happy coding! 💪\n`);
     printHelp(SERVICE_NAME);
   } catch (error) {
     handleError(error);

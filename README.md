@@ -27,6 +27,8 @@ $ cd my-service
 $ npm start
 ```
 
+![](./install.gif)
+
 ### Requirements
 RabbitMQ is required to allow the service to send and receive messages.
 In case you dont have a RabbitMQ, you can use docker-compose. (Do not use this in production).
