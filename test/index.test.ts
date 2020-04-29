@@ -8,6 +8,7 @@ import {
   RouteHandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
+  RPCHandlerBase,
   Request,
   Response,
 } from '../dist';
@@ -33,7 +34,17 @@ class ApiRouteImpl extends RouteHandlerBase {
 
   public async callback(req: Request, res: Response): Promise<any> {
     this.emitEvent('tmp-variable-update.requrired', {});
-    res.status(200).send('ok');
+    return res.status(200).send('ok');
+  }
+}
+class ApiRouteImplSync extends RouteHandlerBase {
+  public url: string = '/tmp-variable-sync';
+
+  public async callback(req: Request, res: Response): Promise<any> {
+    const { error, status, transactionId, data } = await this.callRPC(configuration.service.service, 'update-tmp-variable', { value: true });
+    if (error) return res.status(500).send(error);
+
+    return res.status(200).send('ok');
   }
 }
 
@@ -52,6 +63,19 @@ class TaskImpl extends TaskHandlerBase {
 
   protected async handleCallback(data: any): Promise<void> {
     tmp = true;
+  }
+}
+
+// rpc
+class RPCImpl extends RPCHandlerBase {
+  public topic: string = 'update-tmp-variable';
+
+  protected async handleCallback(data: any): Promise<void> {
+    const value = _.get(data, 'value');
+
+    if (_.isNil(value)) throw Error('Invalid param');
+
+    tmp = value;
   }
 }
 
@@ -75,17 +99,42 @@ describe('Start service', () => {
     const task = new TaskImpl(service.resources);
     await service.loadTask(task);
 
-    await service.initRPCs();
+    // load rpc
+    const rpc = new RPCImpl(service.resources);
+    await service.loadRPC(rpc);
 
     // load route
     const route = new ApiRouteImpl(service.resources);
+    const routeSync = new ApiRouteImplSync(service.resources);
     await service.loadRoute(route, 'put');
+    await service.loadRoute(routeSync, 'put');
     await service.startAPI();
   });
 
+  beforeEach(async () => {
+    tmp = false;
+  });
+
   it('API, events and task', async () => {
+    // initial value is fasle
+    expect(tmp).to.equal(false);
+
     // PUT request for update tmp variable
     const response = await axios.put('http://localhost:8000/tmp-variable', {});
+    expect(response.status).to.equal(200);
+
+    // delay 1 sec to be sure the events went on.
+    await delay(1);
+
+    expect(tmp).to.equal(true);
+  });
+
+  it('API, RPC', async () => {
+    // initial value is fasle
+    expect(tmp).to.equal(false);
+
+    // PUT request for update tmp variable
+    const response = await axios.put('http://localhost:8000/tmp-variable-sync', {});
     expect(response.status).to.equal(200);
 
     // delay 1 sec to be sure the events went on.
