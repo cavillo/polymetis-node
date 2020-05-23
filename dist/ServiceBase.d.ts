@@ -1,9 +1,9 @@
 /// <reference types="express" />
 import Rabbit from './rabbit';
-import Logger from './utils/Logger';
-import { Express, TrustedEndpoints } from './utils/API';
-import { EventHandlerBase, TaskHandlerBase, RPCHandlerBase, RouteHandlerBase } from './base';
-import { Configuration } from './utils/ServiceConf';
+import { Logger } from './utils/logger';
+import { Express } from './utils/api';
+import { EventHandlerBase, TaskHandlerBase, RPCHandlerBase, RouteHandlerBase } from './handlers';
+import { Configuration } from './utils/config';
 export interface ServiceResources {
     configuration: Configuration;
     rabbit: Rabbit;
@@ -33,5 +33,5 @@ export default class ServiceBase {
     loadEvent(handler: EventHandlerBase): Promise<void>;
     loadTask(handler: TaskHandlerBase): Promise<void>;
     loadRPC(handler: RPCHandlerBase): Promise<void>;
-    loadRoute(handler: RouteHandlerBase, method: TrustedEndpoints): Promise<void>;
+    loadRoute(handler: RouteHandlerBase): Promise<void>;
 }

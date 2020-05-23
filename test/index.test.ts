@@ -11,6 +11,7 @@ import {
   RPCHandlerBase,
   Request,
   Response,
+  RouteBaseTrustedMethods,
 } from '../dist';
 
 import configuration from './conf/service.conf';
@@ -31,6 +32,7 @@ let tmp: boolean = false;
 // api route
 class ApiRouteImpl extends RouteHandlerBase {
   public url: string = '/tmp-variable';
+  public method: RouteBaseTrustedMethods = 'put';
 
   public async callback(req: Request, res: Response): Promise<any> {
     this.emitEvent('tmp-variable-update.requrired', {});
@@ -38,7 +40,8 @@ class ApiRouteImpl extends RouteHandlerBase {
   }
 }
 class ApiRouteImplSync extends RouteHandlerBase {
-  public url: string = '/tmp-variable-sync';
+  public url = '/tmp-variable-sync';
+  public method: RouteBaseTrustedMethods = 'put';
 
   public async callback(req: Request, res: Response): Promise<any> {
     const { error, status, transactionId, data } = await this.callRPC(configuration.service.service, 'update-tmp-variable', { value: true });
@@ -106,8 +109,8 @@ describe('Start service', () => {
     // load route
     const route = new ApiRouteImpl(service.resources);
     const routeSync = new ApiRouteImplSync(service.resources);
-    await service.loadRoute(route, 'put');
-    await service.loadRoute(routeSync, 'put');
+    await service.loadRoute(route);
+    await service.loadRoute(routeSync);
     await service.startAPI();
   });
 
