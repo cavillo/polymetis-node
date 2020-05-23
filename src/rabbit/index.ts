@@ -1,8 +1,7 @@
 import amqplib from 'amqplib';
 import * as _ from 'lodash';
-import { Configuration } from '../utils/ServiceConf';
-import Logger from '../utils/Logger';
 import { clearTimeout } from 'timers';
+import { Configuration, Logger } from '../utils';
 
 export interface RPCResponsePayload {
   transactionId: string;

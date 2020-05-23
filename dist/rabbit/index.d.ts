@@ -1,6 +1,5 @@
 import amqplib from 'amqplib';
-import { Configuration } from '../utils/ServiceConf';
-import Logger from '../utils/Logger';
+import { Configuration, Logger } from '../utils';
 export interface RPCResponsePayload {
     transactionId: string;
     data?: any | null;

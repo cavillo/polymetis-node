@@ -3,29 +3,30 @@ import * as bodyParser from 'body-parser';
 import cors from 'cors';
 
 import Rabbit from './rabbit';
-import Logger from './utils/Logger';
+import { Logger } from './utils/logger';
 import {
   express,
   Express,
-  loadRoutes,
   logApiRoute,
-  TrustedEndpoints,
-} from './utils/API';
+} from './utils/api';
 import {
   loadEvents,
   loadTasks,
   loadRPCs,
+  loadRoutes,
+} from './utils/loaders';
+import {
   EventHandlerBase,
   TaskHandlerBase,
   RPCHandlerBase,
   RouteHandlerBase,
-} from './base';
+} from './handlers';
 import {
   serviceConf,
   rabbitConf,
   apiConf,
   Configuration,
-} from './utils/ServiceConf';
+} from './utils/config';
 
 export interface ServiceResources {
   configuration: Configuration;
@@ -162,8 +163,8 @@ export default class ServiceBase {
     this.rpcs[handler.topic] = handler;
   }
 
-  async loadRoute(handler: RouteHandlerBase, method: TrustedEndpoints): Promise<void> {
-    const routeId = `${method}:${handler.url}`;
+  async loadRoute(handler: RouteHandlerBase): Promise<void> {
+    const routeId = `${handler.method}:${handler.url}`;
     if (_.has(this.routes, routeId)) {
       throw new Error(`Duplicated API route listener: ${routeId}`);
     }
@@ -171,7 +172,7 @@ export default class ServiceBase {
     const apiBaseRoute = _.isEmpty(this.resources.configuration.api.baseRoute) ? '' : this.resources.configuration.api.baseRoute;
     const routeURL = `${apiBaseRoute}${handler.url}`;
 
-    switch (method) {
+    switch (handler.method) {
       case 'get':
         this.app.get(routeURL, handler.routeCallback.bind(handler));
         break;
@@ -186,7 +187,7 @@ export default class ServiceBase {
         break;
     }
 
-    this.routes[`${method}:${handler.url}`] = handler;
-    this.resources.logger.info('-[route]', _.toUpper(method), routeURL);
+    this.routes[`${handler.method}:${handler.url}`] = handler;
+    this.resources.logger.info('-[route]', _.toUpper(handler.method), routeURL);
   }
 }

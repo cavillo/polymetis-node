@@ -7,7 +7,15 @@ import {
   apiConf,
   rabbitConf,
   configuration,
-} from './utils/ServiceConf';
+
+  Express,
+  NextFunction,
+  Request,
+  Response,
+
+  Logger,
+  LoggerMode,
+} from './utils';
 
 import {
   Base,
@@ -16,25 +24,16 @@ import {
   TaskHandlerBase,
   RPCHandlerBase,
   RouteHandlerBase,
-} from './base';
-import ApiRoute from './base/RouteHandlerBase'; // TODO: remove duplicated renamed interface
-
-import {
-  Express,
-  NextFunction,
-  Request,
-  Response,
-} from './utils/API';
-
-import Logger, { LoggerMode } from './utils/Logger';
+  RouteBaseTrustedMethods,
+} from './handlers';
 
 import ServiceBase, {
   ServiceResources,
 } from './ServiceBase';
 
 export {
-  ApiRoute, // TODO: remove duplicated renamed interface
   RouteHandlerBase,
+  RouteBaseTrustedMethods,
   Configuration,
   ServiceResources,
   ServiceBase,
