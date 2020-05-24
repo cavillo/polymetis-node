@@ -2,11 +2,13 @@ import * as _ from 'lodash';
 import {
   Request,
   Response,
-  ApiRoute,
+  RouteHandlerBase,
+  RouteBaseTrustedMethods,
   ServiceResources,
 } from 'polymetis-node';
 
-export default class ApiRouteImpl extends ApiRoute {
+export default class ApiRouteImpl extends RouteHandlerBase {
+  public method: RouteBaseTrustedMethods = 'get';
   public url: string = '/healthz';
 
   constructor(resources: ServiceResources) {

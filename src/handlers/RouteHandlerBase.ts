@@ -38,4 +38,11 @@ export default abstract class RouteBase extends Base {
     this.resources.logger.error(statusCode, message, JSON.stringify(error));
     return res.status(statusCode).send(message);
   }
+
+  protected throwError(statusCode: number, message: string) {
+    throw {
+      message,
+      statusCode,
+    };
+  }
 }

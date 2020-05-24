@@ -78,6 +78,7 @@ export default class ServiceBase {
     };
 
     this.app = express();
+    this.app.use(logApiRoute.bind(this, this.resources));
 
     this.events = {};
     this.tasks = {};
@@ -115,7 +116,6 @@ export default class ServiceBase {
   }
 
   async initAPIRoutes() {
-    this.app.use(logApiRoute.bind(this, this.resources));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
