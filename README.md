@@ -238,9 +238,9 @@ base_dir
 Polymetis creates an **ExpressJS REST API** for the service on the port specified in the configuration. The endpoints should be implemented as follow:
 All endpoints name should follow the following rules
 - endpoints are defined in the ```baseDir/api``` directory specified un the service configuration
-- endpoints **must start with** the method to implement ```get.``` | ```post.``` | ```put.``` | ```delete.```
 - endpoints **must end with** ```.route.ts```
-- endpoints **must define**  ```this.url``` wich wil be the url to be subscribe
+- endpoints **must define**  ```this.method``` wich represent the REST method (GET, POST, PUT, DELETE)
+- endpoints **must define**  ```this.url``` wich will be the url to be subscribe
 - endpoints **must implement**  ```this.callback(req: Request, res: Response): Promise<any>``` wich wil be the function that will handle the request and produce a response
 All files that follow this rules will be loaded as endpoints when the service starts
 
@@ -249,11 +249,13 @@ All files that follow this rules will be loaded as endpoints when the service st
 import {
   Request,
   Response,
-  ApiRoute,
+  RouteHandlerBase,
+  RouteBaseTrustedMethods,
   ServiceResources,
 } from 'polymetis-node';
 
 export default class ApiRouteImpl extends ApiRoute {
+  public method: RouteBaseTrustedMethods = 'get';
   public url: string = '/healthz';
 
   constructor(resources: ServiceResources) {
