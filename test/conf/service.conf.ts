@@ -1,6 +1,6 @@
 import {
   Configuration,
-} from '../../dist';
+} from '../../src';
 
 const configuration: Configuration = {
   baseDir: __dirname,
@@ -12,6 +12,10 @@ const configuration: Configuration = {
   },
   api: {
     port: 8000,
+  },
+  rpc: {
+    port: 8111,
+    baseRoute: '',
   },
   rabbit: {
     host: 'localhost', // change to localhost in local env

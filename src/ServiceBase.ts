@@ -25,6 +25,7 @@ import {
   serviceConf,
   rabbitConf,
   apiConf,
+  rpcConf,
   Configuration,
 } from './utils/config';
 
@@ -42,7 +43,8 @@ export interface ServiceOptions {
 export default class ServiceBase {
   public configuration: Configuration;
   public logger: Logger;
-  public app: Express;
+  public apiApp: Express;
+  public rpcApp: Express;
   public resources: ServiceResources;
 
   protected events: any;
@@ -59,6 +61,7 @@ export default class ServiceBase {
       service: serviceConf,
       rabbit: rabbitConf,
       api: apiConf,
+      rpc: rpcConf,
     };
 
     if (conf) {
@@ -77,8 +80,13 @@ export default class ServiceBase {
       logger: this.logger,
     };
 
-    this.app = express();
-    this.app.use(logApiRoute.bind(this, this.resources));
+    // API APP
+    this.apiApp = express();
+    this.apiApp.use(logApiRoute.bind(this, this.resources));
+
+    // RPC APP
+    this.rpcApp = express();
+    this.rpcApp.use(logApiRoute.bind(this, this.resources));
 
     this.events = {};
     this.tasks = {};
@@ -107,18 +115,21 @@ export default class ServiceBase {
     this.resources.logger.info('Events initialized');
   }
 
-  async initRPCs() {
+  async initRPCProcedures() {
+    this.rpcApp.use(bodyParser.json());
+    this.rpcApp.use(bodyParser.urlencoded({ extended: false }));
+    this.rpcApp.use(cors());
+
     await loadRPCs(this);
     if (_.isEmpty(this.rpcs)) {
       this.resources.logger.warn('- No RPC\'s loaded...');
     }
-    this.resources.logger.info('RPC\'s initialized');
   }
 
   async initAPIRoutes() {
-    this.app.use(bodyParser.json());
-    this.app.use(bodyParser.urlencoded({ extended: false }));
-    this.app.use(cors());
+    this.apiApp.use(bodyParser.json());
+    this.apiApp.use(bodyParser.urlencoded({ extended: false }));
+    this.apiApp.use(cors());
 
     await loadRoutes(this);
     if (_.isEmpty(this.routes)) {
@@ -127,13 +138,23 @@ export default class ServiceBase {
   }
 
   async startAPI() {
-    await this.app.listen(this.resources.configuration.api.port);
+    await this.apiApp.listen(this.resources.configuration.api.port);
     this.resources.logger.info('API started on port', this.resources.configuration.api.port);
+  }
+
+  async startRPCs() {
+    await this.rpcApp.listen(this.resources.configuration.rpc.port);
+    this.resources.logger.info('RPCs started on port', this.resources.configuration.rpc.port);
   }
 
   async initAPI() {
     await this.initAPIRoutes();
     await this.startAPI();
+  }
+
+  async initRPCs() {
+    await this.initRPCProcedures();
+    await this.startRPCs();
   }
 
   async loadEvent(handler: EventHandlerBase): Promise<void> {
@@ -155,12 +176,18 @@ export default class ServiceBase {
   }
 
   async loadRPC(handler: RPCHandlerBase): Promise<void> {
-    if (_.has(this.rpcs, handler.topic)) {
-      throw new Error(`Duplicated rpcs listener: ${handler.topic}`);
+    const rpcId = handler.procedure;
+    if (_.has(this.rpcs, rpcId)) {
+      throw new Error(`Duplicated RPC route listener: ${rpcId}`);
     }
 
-    await handler.init();
-    this.rpcs[handler.topic] = handler;
+    const rpcBaseRoute = _.isEmpty(this.resources.configuration.rpc.baseRoute) ? '' : this.resources.configuration.rpc.baseRoute;
+    const routeURL = `${rpcBaseRoute}${handler.procedure}`;
+
+    this.rpcApp.post(routeURL, handler.routeCallback.bind(handler));
+
+    this.rpcs[rpcId] = handler;
+    this.resources.logger.info('-[rpc]', routeURL);
   }
 
   async loadRoute(handler: RouteHandlerBase): Promise<void> {
@@ -174,20 +201,20 @@ export default class ServiceBase {
 
     switch (handler.method) {
       case 'get':
-        this.app.get(routeURL, handler.routeCallback.bind(handler));
+        this.apiApp.get(routeURL, handler.routeCallback.bind(handler));
         break;
       case 'post':
-        this.app.post(routeURL, handler.routeCallback.bind(handler));
+        this.apiApp.post(routeURL, handler.routeCallback.bind(handler));
         break;
       case 'put':
-        this.app.put(routeURL, handler.routeCallback.bind(handler));
+        this.apiApp.put(routeURL, handler.routeCallback.bind(handler));
         break;
       case 'delete':
-        this.app.delete(routeURL, handler.routeCallback.bind(handler));
+        this.apiApp.delete(routeURL, handler.routeCallback.bind(handler));
         break;
     }
 
-    this.routes[`${handler.method}:${handler.url}`] = handler;
+    this.routes[routeId] = handler;
     this.resources.logger.info('-[route]', _.toUpper(handler.method), routeURL);
   }
 }

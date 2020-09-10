@@ -4,6 +4,7 @@ import Base from './Base';
 import HandlerBase from './HandlerBase';
 import EventHandlerBase from './EventHandlerBase';
 import TaskHandlerBase from './TaskHandlerBase';
+// import RPCHandlerBase from './RPCHandlerBase';
 import RPCHandlerBase from './RPCHandlerBase';
 import RouteHandlerBase, { RouteBaseTrustedMethods } from './RouteHandlerBase';
 

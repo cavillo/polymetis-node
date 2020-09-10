@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import * as _ from 'lodash';
+import _ from 'lodash';
+import HttpErrors from 'http-errors';
 
 // internal dependencies
 import Base from './Base';
@@ -27,7 +28,7 @@ export default abstract class RouteBase extends Base {
   Each RouteImpl should place the logic of the
   ExpressJS callback methods in here. The handling
   of errors and checking for authentication token,
-  has benn abstracted to the Route base class.
+  has been abstracted to the Route base class.
   */
   protected abstract async callback(req: Request, res: Response): Promise<any>;
 
@@ -35,14 +36,11 @@ export default abstract class RouteBase extends Base {
     const message = _.get(error, 'message', 'Unknown error');
     const statusCode = _.get(error, 'statusCode', 500);
 
-    this.resources.logger.error(statusCode, message, JSON.stringify(error));
+    this.resources.logger.error('APIRoute Error', statusCode, message, JSON.stringify(error));
     return res.status(statusCode).send(message);
   }
 
   protected throwError(statusCode: number, message: string) {
-    throw {
-      message,
-      statusCode,
-    };
+    throw HttpErrors.createError(statusCode, message);
   }
 }
