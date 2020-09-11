@@ -28,9 +28,9 @@ export default abstract class RPCHandlerBase extends Base {
       this.resources.logger.info('RPC-start', this.procedure, transactionId);
 
       const result = await this.callback({ transactionId, payload });
-      return await this.handleSuccess(transactionId, result, res);
+      return this.handleSuccess(transactionId, result, res);
     } catch (error) {
-      await this.handleError(error, req, res);
+      this.handleError(error, req, res);
     }
   }
 
@@ -43,7 +43,7 @@ export default abstract class RPCHandlerBase extends Base {
   */
   protected abstract async callback(data: { transactionId: string, payload: any }): Promise<any>;
 
-  protected async handleSuccess(transactionId: string, data: any, res: Response) {
+  protected handleSuccess(transactionId: string, data: any, res: Response) {
     this.resources.logger.info('RPC-success', this.procedure, transactionId);
     return res.status(200).send({
       transactionId,
@@ -51,7 +51,7 @@ export default abstract class RPCHandlerBase extends Base {
     });
   }
 
-  protected async handleError(error: Error, req: Request, res: Response) {
+  protected handleError(error: Error, req: Request, res: Response) {
     const message = _.get(error, 'message', 'Unknown error');
     const transactionId: string = _.get(req.body, 'transactionId');
 

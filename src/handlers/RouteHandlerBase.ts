@@ -19,7 +19,7 @@ export default abstract class RouteBase extends Base {
     try {
       return await this.callback(req, res);
     } catch (error) {
-      await this.handleError(error, res);
+      this.handleError(error, res);
     }
   }
 
@@ -32,7 +32,7 @@ export default abstract class RouteBase extends Base {
   */
   protected abstract async callback(req: Request, res: Response): Promise<any>;
 
-  protected async handleError(error: Error, res: Response) {
+  protected handleError(error: Error, res: Response) {
     const message = _.get(error, 'message', 'Unknown error');
     const statusCode = _.get(error, 'statusCode', 500);
 
