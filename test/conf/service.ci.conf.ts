@@ -13,6 +13,10 @@ const configuration: Configuration = {
   api: {
     port: 8000,
   },
+  rpc: {
+    port: 8111,
+    baseRoute: '',
+  },
   rabbit: {
     host: 'rabbit',
     port: 5672,

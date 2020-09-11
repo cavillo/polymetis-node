@@ -4,7 +4,7 @@ import axios from 'axios';
 import 'mocha';
 import {
   ServiceBase,
-  Configuration,
+  configuration,
   RouteHandlerBase,
   EventHandlerBase,
   TaskHandlerBase,
@@ -14,14 +14,15 @@ import {
   RouteBaseTrustedMethods,
 } from '../dist';
 
-import configuration from './conf/service.conf';
+import testConfiguration from './conf/service.conf';
+import { assert } from 'console';
 
 /**
  * The objective of the test is to verify
- * the basic service comunication for Events and Tasks.
+ * the basic service communication for Events and Tasks.
  * - A global tmp variable (boolean) is defined as false.
  * - A PUT request is made to the API where an event
- * [tmp-variable-update.requrired] is emited that
+ * [tmp-variable-update.required] is emitted that
  * creates the task [update.tmp-variable].
  * - After the task is performed, the variable tmp should be true.
  */
@@ -35,7 +36,7 @@ class ApiRouteImpl extends RouteHandlerBase {
   public method: RouteBaseTrustedMethods = 'put';
 
   public async callback(req: Request, res: Response): Promise<any> {
-    this.emitEvent('tmp-variable-update.requrired', {});
+    this.emitEvent('tmp-variable-update.required', {});
     return res.status(200).send('ok');
   }
 }
@@ -44,16 +45,27 @@ class ApiRouteImplSync extends RouteHandlerBase {
   public method: RouteBaseTrustedMethods = 'put';
 
   public async callback(req: Request, res: Response): Promise<any> {
-    const { error, status, transactionId, data } = await this.callRPC(configuration.service.service, 'update-tmp-variable', { value: true });
-    if (error) return res.status(500).send(error);
+    try {
+      await this.callRPC<void>(
+        'http://localhost:8111/update-tmp-variable-err',
+        { value: true },
+      );
+      assert(false);
+    } catch (error) {
+      assert(true, error.message);
+    }
 
+    await this.callRPC<void>(
+      'http://localhost:8111/update-tmp-variable',
+      { value: true },
+    );
     return res.status(200).send('ok');
   }
 }
 
 // event
 class EventImpl extends EventHandlerBase {
-  public topic: string = 'tmp-variable-update.requrired';
+  public topic: string = 'tmp-variable-update.required';
 
   protected async handleCallback(data: any): Promise<void> {
     await this.emitTask('update.tmp-variable', {});
@@ -71,14 +83,22 @@ class TaskImpl extends TaskHandlerBase {
 
 // rpc
 class RPCImpl extends RPCHandlerBase {
-  public topic: string = 'update-tmp-variable';
+  public procedure: string = 'update-tmp-variable';
 
-  protected async handleCallback(data: any): Promise<void> {
-    const value = _.get(data, 'value');
+  protected async callback({ transactionId, payload }): Promise<void> {
+    const value = _.get(payload, 'value');
 
     if (_.isNil(value)) throw Error('Invalid param');
 
     tmp = value;
+    return;
+  }
+}
+class RPCImplErr extends RPCHandlerBase {
+  public procedure: string = 'update-tmp-variable-err';
+
+  protected async callback({ transactionId, payload }): Promise<void> {
+    throw new Error(this.procedure);
   }
 }
 
@@ -91,7 +111,7 @@ const delay = (seconds: number): Promise <void> => {
 
 describe('Start service', () => {
   before(async () => {
-    service = new ServiceBase({ configuration });
+    service = new ServiceBase({ configuration: { ...configuration, ...testConfiguration } });
     await service.init();
 
     // load event
@@ -102,16 +122,19 @@ describe('Start service', () => {
     const task = new TaskImpl(service.resources);
     await service.loadTask(task);
 
-    // load rpc
-    const rpc = new RPCImpl(service.resources);
-    await service.loadRPC(rpc);
-
     // load route
     const route = new ApiRouteImpl(service.resources);
     const routeSync = new ApiRouteImplSync(service.resources);
     await service.loadRoute(route);
     await service.loadRoute(routeSync);
     await service.startAPI();
+
+    // load rpc
+    const rpc = new RPCImpl(service.resources);
+    const rpcErr = new RPCImplErr(service.resources);
+    await service.loadRPC(rpc);
+    await service.loadRPC(rpcErr);
+    await service.startRPCs();
   });
 
   beforeEach(async () => {
@@ -119,7 +142,7 @@ describe('Start service', () => {
   });
 
   it('API, events and task', async () => {
-    // initial value is fasle
+    // initial value is false
     expect(tmp).to.equal(false);
 
     // PUT request for update tmp variable
@@ -133,7 +156,7 @@ describe('Start service', () => {
   });
 
   it('API, RPC', async () => {
-    // initial value is fasle
+    // initial value is false
     expect(tmp).to.equal(false);
 
     // PUT request for update tmp variable
