@@ -15,9 +15,22 @@ export default abstract class RPCHandlerBase extends Base {
   */
   public async routeCallback(req: Request, res: Response): Promise<any> {
     try {
-      return await this.callback(req, res);
+      const transactionId: string = _.get(req.body, 'transactionId');
+      const payload: any = _.get(req.body, 'payload', {});
+
+      if (
+            _.isNil(transactionId) || !_.isString(transactionId)
+        ||  _.isNil(payload) || !_.isObject(payload)
+      ) {
+        throw new Error('Invalid params');
+      }
+
+      this.resources.logger.info('RPC-start', this.procedure, transactionId);
+
+      const result = await this.callback({ transactionId, payload });
+      return await this.handleSuccess(transactionId, result, res);
     } catch (error) {
-      await this.handleError(error, res);
+      await this.handleError(error, req, res);
     }
   }
 
@@ -28,13 +41,22 @@ export default abstract class RPCHandlerBase extends Base {
   of errors and checking for authentication token,
   has been abstracted to the Route base class.
   */
-  protected abstract async callback(req: Request, res: Response): Promise<any>;
+  protected abstract async callback(data: { transactionId: string, payload: any }): Promise<any>;
 
-  protected async handleError(error: Error, res: Response) {
+  protected async handleSuccess(transactionId: string, data: any, res: Response) {
+    this.resources.logger.info('RPC-success', this.procedure, transactionId);
+    return res.status(200).send({
+      transactionId,
+      data,
+    });
+  }
+
+  protected async handleError(error: Error, req: Request, res: Response) {
     const message = _.get(error, 'message', 'Unknown error');
+    const transactionId: string = _.get(req.body, 'transactionId');
 
-    this.resources.logger.error('RPC Error', this.procedure, message, JSON.stringify(error));
-    return res.json({ error: { message } });
+    this.resources.logger.error('RPC-error', this.procedure, transactionId, message);
+    return res.json({ transactionId, error: message });
   }
 
   protected throwError(statusCode: number, message: string) {

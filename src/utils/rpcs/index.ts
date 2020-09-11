@@ -2,8 +2,8 @@ import axios, { AxiosResponse } from 'axios';
 
 export interface RPCResponsePayload {
   transactionId: string;
-  data?: any | null;
-  error?: string | null;
+  data?: any;
+  error?: string;
 }
 
 export const post = async (

@@ -5,7 +5,7 @@
 Polymetis is a tool that provides a light, scalable and customizable base for developing distributed and loosely coupled microservices.
 
 ## Features
-  - Loosely Coupuled
+  - Loosely Coupled
   - Event Driven
   - Scalable
   - REST API
@@ -50,7 +50,7 @@ $ docker-compose up --build --detach
 
 # Getting started
 
-Following the file strcuture defined for ```api```, ```events```, ```tasks``` and ```rpc```.
+Following the file structured defined for ```api```, ```events```, ```tasks``` and ```rpc```.
 
 ```typescript
 import { ServiceBase, Configuration } from 'polymetis-node';
@@ -91,10 +91,18 @@ import {
 
 // api route
 class ApiRouteImpl extends RouteHandlerBase {
-  public url: string = '/healhz';
+  public url: string = '/healthz';
 
   public async callback(req: Request, res: Response): Promise<any> {
+    // creating task
     await this.emitTask('check.healthz', {});
+
+    // calling RPC
+    await this.callRPC<void>(
+      'http://localhost:8111/update-tmp-variable',
+      { value: true },
+    );
+
     res.status(200).send('ok');
   }
 }
@@ -122,6 +130,19 @@ class TaskImpl extends TaskHandlerBase {
   }
 }
 
+// rpc
+class RPCImpl extends RPCHandlerBase {
+  public procedure: string = 'update-tmp-variable';
+
+  protected async callback({ transactionId, payload }): Promise<void> {
+    const value = _.get(payload, 'value');
+
+    if (_.isNil(value)) throw Error('Invalid param');
+
+    return;
+  }
+}
+
 const configuration: Configuration = {
   baseDir: __dirname,
   service: {
@@ -132,6 +153,10 @@ const configuration: Configuration = {
   },
   api: {
     port: 8000,
+  },
+  rpc: {
+    port: 8111,
+    baseRoute: '',
   },
   rabbit: {
     host: 'localhost',
@@ -151,12 +176,15 @@ service.init()
     const task = new TaskImpl(service.resources);
     await service.loadTask(task);
 
-    await service.initRPCs();
-
     // load routes
     const route = new ApiRouteImpl(service.resources);
     await service.loadRoute(route, 'put');
     await service.startAPI();
+
+    // load rpc
+    const rpc = new RPCImpl(service.resources);
+    await service.loadRPC(rpc);
+    await service.startRPCs();
 
     service.logger.info('Service online on pid', process.pid);
   })
@@ -207,6 +235,10 @@ LOGGER_MODE='0'
 API_PORT='7002'
 API_BASE_ROUTE='/api'
 
+# RPC
+RPC_PORT='6002'
+RPC_BASE_ROUTE='/rpc'
+
 # RabbitMQ
 RABBITMQ_USERNAME='guest'
 RABBITMQ_PASSWORD='guest'
@@ -216,7 +248,7 @@ RABBITMQ_PORT='5672'
 
 ## Dir Structure
 ## Base Dir
-A directory should be specified to the **configuration.baseDir** to locate the reources (events, tasks and API REST endpoints) to be deployed by the service.
+A directory should be specified to the **configuration.baseDir** to locate the resources (events, tasks and API REST endpoints) to be deployed by the service.
 ```
 base_dir
 │
@@ -275,7 +307,7 @@ Events have no application name because they can be subscribed to by multiple ap
 
 Events implements a handler class defined to abstract some logic and make the handling more straight forward.
 
-All handlers name should follow the following ruules
+All handlers name should follow the following rules
 - events are defined in the ```baseDir/events```  directory specified in the service configuration
 - events **must end with** ```.event.ts```
 - events **must define** ```this.topic``` to specify the topic to be subscribed
@@ -324,7 +356,7 @@ Tasks start with the model whose state is to be modified by the task, followed b
 
 Tasks implements a handler class defined to abstract some logic and make the handling more straight forward.
 
-All handlers name should follow the following ruules
+All handlers name should follow the following rules
 - tasks are defined in the ```baseDir/tasks```  directory specified in the service configuration
 - tasks **must end with** ```.event.ts```
 - tasks **must define** ```this.topic``` to specify the topic to be subscribed
@@ -360,27 +392,21 @@ export default class Handler extends TaskHandlerBase {
 ```
 
 ### RPC
-Polymetis allows to call remote procedures defined and published by the microservices in the ecosystem. Remote procedures are called using RabbitMQ.
-All defined RCP in a service:
-- are defined in the ```baseDir/rpc``` directory specified un the service configuration
-- **must end with** ```.rpc.ts```
-- **must define**  ```this.topic``` wich represents the name of the procedure
-- **must implement**  ```this.handleCallback(data: any): Promise<any>``` wich will be the function that implements the logic of the procedure
-All files that follow this rules will be loaded as rpc when the service starts following the format ```environment.service.rpc.PROC_NAME```
-
+Polymetis allows to call remote procedures defined and published by the microservices in the ecosystem. Remote procedures are called using HTTP api defined by a RPC on a polymetis service.
 ```typescript
 import * as _ from 'lodash';
 import { ServiceResources, RPCHandlerBase } from 'polymetis-node';
 
-export default class Handler extends RPCHandlerBase {
-  public topic = 'check-healthz';
+class RPCImpl extends RPCHandlerBase {
+  public procedure: string = 'update-tmp-variable';
 
-  constructor(resources: ServiceResources) {
-    super(resources);
-  }
+  protected async callback({ transactionId, payload }): Promise<void> {
+    const value = _.get(payload, 'value');
 
-  protected async handleCallback(data: any): Promise<any> {
-    return 'Im ok!';
+    if (_.isNil(value)) throw Error('Invalid param');
+
+    tmp = value;
+    return;
   }
 }
 ```

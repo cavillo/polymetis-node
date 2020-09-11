@@ -1,6 +1,6 @@
 import {
   Configuration,
-} from '../../src';
+} from '../../dist';
 
 const configuration: Configuration = {
   baseDir: __dirname,

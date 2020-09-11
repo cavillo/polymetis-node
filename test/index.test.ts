@@ -12,9 +12,10 @@ import {
   Request,
   Response,
   RouteBaseTrustedMethods,
-} from '../src';
+} from '../dist';
 
 import testConfiguration from './conf/service.conf';
+import { assert } from 'console';
 
 /**
  * The objective of the test is to verify
@@ -44,12 +45,20 @@ class ApiRouteImplSync extends RouteHandlerBase {
   public method: RouteBaseTrustedMethods = 'put';
 
   public async callback(req: Request, res: Response): Promise<any> {
-    await this.callRPC(
+    try {
+      await this.callRPC<void>(
+        'http://localhost:8111/update-tmp-variable-err',
+        { value: true },
+      );
+      assert(false);
+    } catch (error) {
+      assert(true, error.message);
+    }
+
+    await this.callRPC<void>(
       'http://localhost:8111/update-tmp-variable',
       { value: true },
-      this.generateTransactionId(),
     );
-
     return res.status(200).send('ok');
   }
 }
@@ -76,12 +85,20 @@ class TaskImpl extends TaskHandlerBase {
 class RPCImpl extends RPCHandlerBase {
   public procedure: string = 'update-tmp-variable';
 
-  protected async callback(data: any): Promise<void> {
-    const value = _.get(data, 'value');
+  protected async callback({ transactionId, payload }): Promise<void> {
+    const value = _.get(payload, 'value');
 
     if (_.isNil(value)) throw Error('Invalid param');
 
     tmp = value;
+    return;
+  }
+}
+class RPCImplErr extends RPCHandlerBase {
+  public procedure: string = 'update-tmp-variable-err';
+
+  protected async callback({ transactionId, payload }): Promise<void> {
+    throw new Error(this.procedure);
   }
 }
 
@@ -114,7 +131,9 @@ describe('Start service', () => {
 
     // load rpc
     const rpc = new RPCImpl(service.resources);
+    const rpcErr = new RPCImplErr(service.resources);
     await service.loadRPC(rpc);
+    await service.loadRPC(rpcErr);
     await service.startRPCs();
   });
 
@@ -123,7 +142,7 @@ describe('Start service', () => {
   });
 
   it('API, events and task', async () => {
-    // initial value is fasle
+    // initial value is false
     expect(tmp).to.equal(false);
 
     // PUT request for update tmp variable
@@ -137,7 +156,7 @@ describe('Start service', () => {
   });
 
   it('API, RPC', async () => {
-    // initial value is fasle
+    // initial value is false
     expect(tmp).to.equal(false);
 
     // PUT request for update tmp variable

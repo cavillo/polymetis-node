@@ -83,10 +83,16 @@ export default class ServiceBase {
     // API APP
     this.apiApp = express();
     this.apiApp.use(logApiRoute.bind(this, this.resources));
+    this.apiApp.use(express.json());
+    this.apiApp.use(express.urlencoded({ extended: true }));
+    this.apiApp.use(cors());
 
     // RPC APP
     this.rpcApp = express();
     this.rpcApp.use(logApiRoute.bind(this, this.resources));
+    this.rpcApp.use(express.json());
+    this.rpcApp.use(express.urlencoded({ extended: true }));
+    this.rpcApp.use(cors());
 
     this.events = {};
     this.tasks = {};
@@ -116,10 +122,6 @@ export default class ServiceBase {
   }
 
   async initRPCProcedures() {
-    this.rpcApp.use(bodyParser.json());
-    this.rpcApp.use(bodyParser.urlencoded({ extended: false }));
-    this.rpcApp.use(cors());
-
     await loadRPCs(this);
     if (_.isEmpty(this.rpcs)) {
       this.resources.logger.warn('- No RPC\'s loaded...');
@@ -127,10 +129,6 @@ export default class ServiceBase {
   }
 
   async initAPIRoutes() {
-    this.apiApp.use(bodyParser.json());
-    this.apiApp.use(bodyParser.urlencoded({ extended: false }));
-    this.apiApp.use(cors());
-
     await loadRoutes(this);
     if (_.isEmpty(this.routes)) {
       this.resources.logger.warn('- No routes loaded...');
@@ -182,7 +180,7 @@ export default class ServiceBase {
     }
 
     const rpcBaseRoute = _.isEmpty(this.resources.configuration.rpc.baseRoute) ? '' : this.resources.configuration.rpc.baseRoute;
-    const routeURL = `${rpcBaseRoute}${handler.procedure}`;
+    const routeURL = `${rpcBaseRoute}/${handler.procedure}`;
 
     this.rpcApp.post(routeURL, handler.routeCallback.bind(handler));
 

@@ -22,8 +22,8 @@ export default class Base {
     );
   }
 
-  public async callRPC(url: string, data: any, transactionId: string): Promise<any> {
-    this.resources.logger.info(`Calling RPC ${url}`);
+  public async callRPC<T>(url: string, data: any, transactionId: string = this.generateTransactionId()): Promise<T> {
+    this.resources.logger.info('RPC-calling', url, transactionId);
     try {
       const response: RPCResponsePayload = await post(
         url,
@@ -42,7 +42,7 @@ export default class Base {
 
       return response.data;
     } catch (error) {
-      this.resources.logger.error(`Error calling RPC [${url}]: ${error.message}`);
+      this.resources.logger.error('RPC-calling-error', url, transactionId, error.message);
       throw new Error(error.message);
     }
   }
