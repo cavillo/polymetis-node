@@ -16,7 +16,8 @@ export interface ServiceOptions {
 export default class ServiceBase {
     configuration: Configuration;
     logger: Logger;
-    app: Express;
+    apiApp: Express;
+    rpcApp: Express;
     resources: ServiceResources;
     protected events: any;
     protected tasks: any;
@@ -26,10 +27,12 @@ export default class ServiceBase {
     init(): Promise<void>;
     initTasks(): Promise<void>;
     initEvents(): Promise<void>;
-    initRPCs(): Promise<void>;
+    initRPCProcedures(): Promise<void>;
     initAPIRoutes(): Promise<void>;
     startAPI(): Promise<void>;
+    startRPCs(): Promise<void>;
     initAPI(): Promise<void>;
+    initRPCs(): Promise<void>;
     loadEvent(handler: EventHandlerBase): Promise<void>;
     loadTask(handler: TaskHandlerBase): Promise<void>;
     loadRPC(handler: RPCHandlerBase): Promise<void>;

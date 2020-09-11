@@ -12,6 +12,10 @@ interface ApiConfiguration {
   port?: number;
   baseRoute?: string;
 }
+interface RPCConfiguration {
+  port?: number;
+  baseRoute?: string;
+}
 interface RabbitConfiguration {
   host?: string;
   port?: number;
@@ -19,10 +23,11 @@ interface RabbitConfiguration {
   password?: string;
 }
 interface Configuration {
-  baseDir?: string;
-  service?: ServiceConfiguration;
-  rabbit?: RabbitConfiguration;
-  api?: ApiConfiguration;
+  baseDir: string;
+  service: ServiceConfiguration;
+  rabbit: RabbitConfiguration;
+  api: ApiConfiguration;
+  rpc: RPCConfiguration;
 }
 
 const serviceConf: ServiceConfiguration = {
@@ -33,6 +38,10 @@ const serviceConf: ServiceConfiguration = {
 const apiConf: ApiConfiguration = {
   port: _.toNumber(_.get(process.env, 'API_PORT')),
   baseRoute: _.get(process.env, 'API_BASE_ROUTE'),
+};
+const rpcConf: RPCConfiguration = {
+  port: _.toNumber(_.get(process.env, 'RPC_PORT')),
+  baseRoute: _.get(process.env, 'RPC_BASE_ROUTE'),
 };
 const rabbitConf: RabbitConfiguration = {
   username: _.get(process.env, 'RABBITMQ_USERNAME'),
@@ -45,6 +54,7 @@ const configuration: Configuration = {
   service: serviceConf,
   rabbit: rabbitConf,
   api: apiConf,
+  rpc: rpcConf,
 };
 
 export {
@@ -54,6 +64,7 @@ export {
   Configuration,
   serviceConf,
   apiConf,
+  rpcConf,
   rabbitConf,
   configuration,
 };
