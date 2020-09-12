@@ -1,5 +1,4 @@
-import * as _ from 'lodash';
-import * as bodyParser from 'body-parser';
+import _ from 'lodash';
 import cors from 'cors';
 
 import Rabbit from './rabbit';
@@ -36,7 +35,7 @@ export interface ServiceResources {
 }
 
 export interface ServiceOptions {
-  configuration?: Configuration;
+  configuration?: Partial<Configuration>;
   loggerCallback?: Function | null;
 }
 
@@ -83,9 +82,6 @@ export default class ServiceBase {
     // API APP
     this.apiApp = express();
     this.apiApp.use(logApiRoute.bind(this, this.resources));
-    this.apiApp.use(express.json());
-    this.apiApp.use(express.urlencoded({ extended: true }));
-    this.apiApp.use(cors());
 
     // RPC APP
     this.rpcApp = express();
