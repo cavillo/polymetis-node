@@ -10,7 +10,7 @@ export interface ServiceResources {
     logger: Logger;
 }
 export interface ServiceOptions {
-    configuration?: Configuration;
+    configuration?: Partial<Configuration>;
     loggerCallback?: Function | null;
 }
 export default class ServiceBase {
