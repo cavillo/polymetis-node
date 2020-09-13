@@ -18,7 +18,7 @@ export class Logger {
     protected callback: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null = null,
   ) {}
 
-  public setLoggerCalback(
+  public setLoggerCallback(
     callback: (mode: string, message?: any, ...optionalParams: any[]) => Promise<void> | null,
   ) {
     this.callback = callback;
