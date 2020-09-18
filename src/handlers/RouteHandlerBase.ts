@@ -41,6 +41,6 @@ export default abstract class RouteBase extends Base {
   }
 
   protected throwError(statusCode: number, message: string) {
-    throw HttpErrors.createError(statusCode, message);
+    throw HttpErrors(statusCode, message);
   }
 }
