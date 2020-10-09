@@ -15,6 +15,11 @@ import {
 
   Logger,
   LoggerMode,
+
+  emitEvent,
+  emitTask,
+  callRPC,
+  generateTransactionId,
 } from './utils';
 
 import {
@@ -48,6 +53,10 @@ export {
   Request,
   Logger,
   LoggerMode,
+  emitEvent,
+  emitTask,
+  callRPC,
+  generateTransactionId,
   ServiceConfiguration,
   RabbitConfiguration,
   ApiConfiguration,
