@@ -38,7 +38,7 @@ const loadRPCs = async (service: ServiceBase, dir?: string): Promise<void> => {
     } else {
       try {
         // recurse down the directory tree
-        await this.loadRPCs(service, path.join(handlerPath, '/'));
+        await loadRPCs(service, path.join(handlerPath, '/'));
       } catch (error) {
         continue;
       }

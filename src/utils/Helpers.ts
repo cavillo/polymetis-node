@@ -17,7 +17,7 @@ export const emitTask = async (resources: ServiceResources, task: string, data: 
   );
 };
 
-export const callRPC = async <T>(resources: ServiceResources, url: string, data: any, transactionId: string = this.generateTransactionId()): Promise<T> => {
+export const callRPC = async <T>(resources: ServiceResources, url: string, data: any, transactionId: string = generateTransactionId()): Promise<T> => {
   resources.logger.info('RPC-calling', url, transactionId);
   try {
     const response: RPCResponsePayload = await post(
