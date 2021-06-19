@@ -37,7 +37,7 @@ const loadEvents = async (service: ServiceBase, dir?: string): Promise<void> => 
     } else {
       try {
         // recurse down the directory tree
-        await this.loadEvents(service, path.join(handlerPath, '/'));
+        await loadEvents(service, path.join(handlerPath, '/'));
       } catch (error) {
         continue;
       }
