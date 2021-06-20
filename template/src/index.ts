@@ -1,7 +1,7 @@
 import { ServiceBase, Configuration } from 'polymetis-node';
 
 // Initializing service
-const configuration: Configuration = {
+const configuration: Partial<Configuration> = {
   baseDir: __dirname,
 };
 

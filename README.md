@@ -56,7 +56,7 @@ Following the file structured defined for ```api```, ```events```, ```tasks``` a
 import { ServiceBase, Configuration } from 'polymetis-node';
 
 // Initializing service
-const configuration: Configuration = {
+const configuration: Partial<Configuration> = {
   baseDir: __dirname,
 };
 
