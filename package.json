@@ -1,6 +1,6 @@
 {
   "name": "polymetis-node",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Microservices development framework for NodeJS",
   "main": "dist/index.js",
   "scripts": {
@@ -51,7 +51,7 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "amqplib": "^0.5.3",
+    "amqplib": "^0.8.0",
     "axios": "^0.21.1",
     "chalk": "^2.4.1",
     "cors": "^2.8.5",
