@@ -44,7 +44,7 @@
     "@types/mocha": "5.2.6",
     "@types/node": "^10.14.13",
     "chai": "^4.2.0",
-    "mocha": "^6.2.3",
+    "mocha": "^10.2.0",
     "ts-node": "^8.8.1",
     "tslint": "5.11.0",
     "tslint-config-airbnb": "5.11.0",
