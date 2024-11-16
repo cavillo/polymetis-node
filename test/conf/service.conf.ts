@@ -19,7 +19,7 @@ const configuration: Configuration = {
   },
   rabbit: {
     host: 'localhost', // change to localhost in local env
-    port: 5672,
+    port: 5671,
     username: 'guest',
     password: 'guest',
   },

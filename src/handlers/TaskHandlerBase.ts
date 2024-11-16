@@ -26,6 +26,6 @@ export default abstract class TaskHandlerBase extends HandlerBase{
     }
   }
 
-  protected abstract async handleCallback(data: any): Promise<void>;
+  protected abstract handleCallback(data: any): Promise<void>;
 
 }

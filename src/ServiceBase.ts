@@ -41,15 +41,16 @@ export interface ServiceOptions {
 
 export default class ServiceBase {
   public configuration: Configuration;
+  public resources: ServiceResources;
+
   public logger: Logger;
   public apiApp: Express;
   public rpcApp: Express;
-  public resources: ServiceResources;
 
-  protected events: any;
-  protected tasks: any;
-  protected routes: any;
-  protected rpcs: any;
+  protected events: { [key: string]: EventHandlerBase } = {};
+  protected tasks: { [key: string]: TaskHandlerBase } = {};
+  protected routes: { [key: string]: RouteHandlerBase } = {};
+  protected rpcs: { [key: string]: RPCHandlerBase } = {};
 
   constructor(opts?: ServiceOptions) {
     const conf = _.get(opts, 'configuration', null);
@@ -69,6 +70,7 @@ export default class ServiceBase {
         _.pick(conf, _.keys(configuration)),
       );
     }
+
     this.configuration = configuration;
     this.logger = new Logger(configuration.service, loggerCallback);
 

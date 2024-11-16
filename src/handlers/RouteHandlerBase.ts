@@ -30,7 +30,7 @@ export default abstract class RouteBase extends Base {
   of errors and checking for authentication token,
   has been abstracted to the Route base class.
   */
-  protected abstract async callback(req: Request, res: Response): Promise<any>;
+  protected abstract callback(req: Request, res: Response): Promise<any>;
 
   protected handleError(error: Error, res: Response) {
     const message = _.get(error, 'message', 'Unknown error');

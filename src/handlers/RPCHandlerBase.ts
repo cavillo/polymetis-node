@@ -41,7 +41,7 @@ export default abstract class RPCHandlerBase extends Base {
   of errors and checking for authentication token,
   has been abstracted to the Route base class.
   */
-  protected abstract async callback(data: { transactionId: string, payload: any }): Promise<any>;
+  protected abstract callback(data: { transactionId: string, payload: any }): Promise<any>;
 
   protected handleSuccess(transactionId: string, data: any, res: Response) {
     this.resources.logger.info('RPC-success', this.procedure, transactionId);

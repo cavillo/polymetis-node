@@ -30,7 +30,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/amqplib": "^0.5.10",
-    "@types/axios": "^0.14.0",
+    "@types/axios": "^0.14.4",
     "@types/chai": "4.1.7",
     "@types/cors": "^2.8.4",
     "@types/crypto-js": "^3.1.43",
@@ -44,18 +44,18 @@
     "@types/mocha": "5.2.6",
     "@types/node": "^10.14.13",
     "chai": "^4.2.0",
-    "mocha": "^6.2.3",
+    "mocha": "^10.8.2",
     "ts-node": "^8.8.1",
     "tslint": "5.11.0",
     "tslint-config-airbnb": "5.11.0",
-    "typescript": "^3.1.6"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "amqplib": "^0.8.0",
-    "axios": "^0.21.1",
+    "axios": "^1.7.7",
     "chalk": "^2.4.1",
     "cors": "^2.8.5",
-    "crypto-js": "^3.1.9-1",
+    "crypto-js": "^4.2.0",
     "dockerode": "^3.1.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",

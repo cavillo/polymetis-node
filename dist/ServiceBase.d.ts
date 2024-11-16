@@ -1,4 +1,3 @@
-/// <reference types="express" />
 import Rabbit from './rabbit';
 import { Logger } from './utils/logger';
 import { Express } from './utils/api';
@@ -15,14 +14,22 @@ export interface ServiceOptions {
 }
 export default class ServiceBase {
     configuration: Configuration;
+    resources: ServiceResources;
     logger: Logger;
     apiApp: Express;
     rpcApp: Express;
-    resources: ServiceResources;
-    protected events: any;
-    protected tasks: any;
-    protected routes: any;
-    protected rpcs: any;
+    protected events: {
+        [key: string]: EventHandlerBase;
+    };
+    protected tasks: {
+        [key: string]: TaskHandlerBase;
+    };
+    protected routes: {
+        [key: string]: RouteHandlerBase;
+    };
+    protected rpcs: {
+        [key: string]: RPCHandlerBase;
+    };
     constructor(opts?: ServiceOptions);
     init(): Promise<void>;
     initTasks(): Promise<void>;
