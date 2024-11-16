@@ -50,6 +50,8 @@ export default class ServiceBase {
   protected tasks: any;
   protected routes: any;
   protected rpcs: any;
+  private apiServer: any;
+  private rpcServer: any;
 
   constructor(opts?: ServiceOptions) {
     const conf = _.get(opts, 'configuration', null);
@@ -132,13 +134,31 @@ export default class ServiceBase {
   }
 
   async startAPI() {
-    await this.apiApp.listen(this.resources.configuration.api.port);
+    this.apiServer = await this.apiApp.listen(this.resources.configuration.api.port);
     this.resources.logger.info('API started on port', this.resources.configuration.api.port);
   }
 
+  async stopAPI() {
+    if (this.apiServer) {
+      await this.apiServer.close();
+      this.resources.logger.info('API stopped on port', this.resources.configuration.api.port);
+    } else {
+      this.resources.logger.warn('API server is not running');
+    }
+  }
+
   async startRPCs() {
-    await this.rpcApp.listen(this.resources.configuration.rpc.port);
+    this.rpcServer = await this.rpcApp.listen(this.resources.configuration.rpc.port);
     this.resources.logger.info('RPCs started on port', this.resources.configuration.rpc.port);
+  }
+
+  async stopRPCs() {
+    if (this.rpcServer) {
+      await this.rpcServer.close();
+      this.resources.logger.info('RPCs stopped on port', this.resources.configuration.rpc.port);
+    } else {
+      this.resources.logger.warn('RPC server is not running');
+    }
   }
 
   async initAPI() {
